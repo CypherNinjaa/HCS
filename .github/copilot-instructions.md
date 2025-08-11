@@ -81,15 +81,29 @@ teachers, admins) requiring the highest security standards and robust architectu
 - **ALWAYS** use Next.js Image component for all images
 - **ALWAYS** implement Progressive Web App features
 
-### UI/UX Rules
+### UI/UX Rules - Mobile-First Design for School Students
 
-- **ALWAYS** implement responsive design (mobile-first)
-- **ALWAYS** follow accessibility guidelines (WCAG 2.1 AA)
-- **ALWAYS** implement proper focus management
-- **ALWAYS** use semantic HTML elements
-- **ALWAYS** implement proper loading and error states
-- **ALWAYS** provide user feedback for all actions
-- **ALWAYS** implement proper form validation with clear error messages
+- **ALWAYS** implement mobile-first responsive design as PRIMARY priority (students use phones most)
+- **ALWAYS** design for touch interactions with minimum 44px touch targets
+- **ALWAYS** use large, colorful, and engaging UI elements that appeal to students
+- **ALWAYS** implement smooth animations and micro-interactions for engagement
+- **ALWAYS** follow accessibility guidelines (WCAG 2.1 AA) with high contrast ratios
+- **ALWAYS** implement proper focus management with visible focus indicators
+- **ALWAYS** use semantic HTML elements for screen readers
+- **ALWAYS** implement proper loading states with skeleton screens and spinners
+- **ALWAYS** provide immediate visual feedback for all user actions
+- **ALWAYS** implement proper form validation with clear, friendly error messages
+- **ALWAYS** use intuitive navigation patterns optimized for thumb navigation
+- **ALWAYS** implement swipe gestures and touch-friendly interactions
+- **ALWAYS** ensure text is easily readable on small screens (minimum 16px)
+- **ALWAYS** use progressive disclosure to avoid overwhelming students
+- **ALWAYS** implement dark mode support for better accessibility
+- **ALWAYS** test on actual mobile devices, not just browser emulation
+- **ALWAYS** prioritize mobile performance with lazy loading and code splitting
+- **ALWAYS** use mobile-friendly animations with reduced motion support
+- **ALWAYS** implement PWA features for app-like experience
+- **ALWAYS** ensure all interactive elements are thumb-friendly on mobile
+- **ALWAYS** use vibrant, student-friendly color schemes that work in both light and dark modes
 
 ## Role-Specific Security Rules
 
