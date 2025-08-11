@@ -7,7 +7,9 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 export function MobileHero() {
 	return (
-		<section className="relative py-20 md:py-32 bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 overflow-hidden">
+		<section className="relative py-20 md:py-32 bg-background overflow-hidden">
+			{/* Background gradient overlay */}
+			<div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5"></div>
 			{/* Floating Elements */}
 			<div className="absolute inset-0 overflow-hidden pointer-events-none">
 				<motion.div
@@ -34,10 +36,10 @@ export function MobileHero() {
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}
-						className="inline-flex items-center gap-2 px-6 py-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full shadow-lg border border-blue-200 dark:border-blue-800"
+						className="inline-flex items-center gap-2 px-6 py-3 bg-card/90 backdrop-blur-sm rounded-full shadow-lg border border-border"
 					>
 						<Sparkles className="w-4 h-4 text-yellow-500" />
-						<span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+						<span className="text-sm font-semibold text-muted-foreground">
 							🌟 Building Tomorrow&apos;s Leaders Today
 						</span>
 					</motion.div>
@@ -50,13 +52,13 @@ export function MobileHero() {
 						className="space-y-4"
 					>
 						<h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight">
-							<span className="text-gray-900 dark:text-white">Welcome to</span>
+							<span className="text-foreground">Welcome to</span>
 							<br />
 							<span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent">
 								Happy Child School
 							</span>
 						</h1>
-						<p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+						<p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
 							Where innovation meets education! We nurture young minds with
 							cutting-edge facilities, expert teachers, and a curriculum
 							designed for the digital age.
@@ -84,7 +86,7 @@ export function MobileHero() {
 						<Button
 							size="lg"
 							variant="outline"
-							className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl px-8 py-6 text-lg font-semibold transition-all duration-300 hover:scale-105"
+							className="border-2 border-primary text-primary hover:bg-primary/10 rounded-2xl px-8 py-6 text-lg font-semibold transition-all duration-300 hover:scale-105"
 							asChild
 						>
 							<Link href="/virtual-tour">🏫 Virtual Tour</Link>

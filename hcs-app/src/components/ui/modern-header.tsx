@@ -33,7 +33,7 @@ export function ModernHeader() {
 		<motion.header
 			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
 				isScrolled
-					? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg shadow-lg border-b border-gray-200 dark:border-gray-800"
+					? "bg-background/95 backdrop-blur-lg shadow-lg border-b border-border"
 					: "bg-transparent"
 			}`}
 			initial={{ y: -100 }}
@@ -51,10 +51,10 @@ export function ModernHeader() {
 							<div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
 						</div>
 						<div className="hidden sm:block">
-							<div className="font-bold text-lg md:text-xl text-gray-900 dark:text-white">
+							<div className="font-bold text-lg md:text-xl text-foreground">
 								Happy Child School
 							</div>
-							<div className="text-xs text-gray-500 dark:text-gray-400">
+							<div className="text-xs text-muted-foreground">
 								Excellence in Education
 							</div>
 						</div>
@@ -66,10 +66,10 @@ export function ModernHeader() {
 							<Link
 								key={item.name}
 								href={item.href}
-								className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
+								className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:bg-muted ${
 									item.href === "/"
-										? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-										: "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+										? "text-primary bg-muted"
+										: "text-foreground hover:text-primary"
 								}`}
 							>
 								{item.name}
@@ -85,7 +85,7 @@ export function ModernHeader() {
 							<Button
 								variant="ghost"
 								size="sm"
-								className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+								className="text-foreground hover:text-primary"
 								asChild
 							>
 								<Link href="/login">Portal Login</Link>
@@ -125,7 +125,7 @@ export function ModernHeader() {
 						animate={{ opacity: 1, height: "auto" }}
 						exit={{ opacity: 0, height: 0 }}
 						transition={{ duration: 0.3 }}
-						className="lg:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800"
+						className="lg:hidden bg-background/95 backdrop-blur-lg border-t border-border"
 					>
 						<div className="container mx-auto px-4 py-4">
 							<nav className="space-y-2">
@@ -135,8 +135,8 @@ export function ModernHeader() {
 										href={item.href}
 										className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
 											item.href === "/"
-												? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-												: "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+												? "text-primary bg-muted"
+												: "text-foreground hover:bg-muted"
 										}`}
 										onClick={() => setIsMobileMenuOpen(false)}
 									>
@@ -145,10 +145,10 @@ export function ModernHeader() {
 								))}
 							</nav>
 
-							<div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 dark:border-gray-800">
+							<div className="flex flex-col space-y-2 pt-4 border-t border-border">
 								<Button
 									variant="ghost"
-									className="justify-start text-gray-700 dark:text-gray-300"
+									className="justify-start text-foreground"
 									asChild
 								>
 									<Link

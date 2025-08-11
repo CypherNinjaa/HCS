@@ -12,7 +12,7 @@ import { ModernFooter } from "@/components/ui/modern-footer";
 
 export default function HomePage() {
 	return (
-		<div className="min-h-screen bg-white dark:bg-slate-900">
+		<div className="min-h-screen bg-background">
 			<ModernHeader />
 			<MobileHero />
 			<GalleryCarousel />

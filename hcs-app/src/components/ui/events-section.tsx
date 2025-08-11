@@ -25,8 +25,6 @@ export function EventsSection() {
 			attendees: 500,
 			emoji: "🏃‍♂️",
 			gradient: "from-blue-500 to-cyan-500",
-			bgGradient: "from-blue-50 to-cyan-50",
-			darkBgGradient: "from-blue-900/20 to-cyan-900/20",
 		},
 		{
 			id: 2,
@@ -37,8 +35,6 @@ export function EventsSection() {
 			attendees: 200,
 			emoji: "🔬",
 			gradient: "from-purple-500 to-pink-500",
-			bgGradient: "from-purple-50 to-pink-50",
-			darkBgGradient: "from-purple-900/20 to-pink-900/20",
 		},
 		{
 			id: 3,
@@ -49,8 +45,6 @@ export function EventsSection() {
 			attendees: 800,
 			emoji: "🎭",
 			gradient: "from-green-500 to-emerald-500",
-			bgGradient: "from-green-50 to-emerald-50",
-			darkBgGradient: "from-green-900/20 to-emerald-900/20",
 		},
 	];
 
@@ -96,7 +90,7 @@ export function EventsSection() {
 	});
 
 	return (
-		<section className="py-16 md:py-24 bg-white dark:bg-slate-900">
+		<section className="py-16 md:py-24 bg-background">
 			<div className="container mx-auto px-4">
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
@@ -105,10 +99,10 @@ export function EventsSection() {
 					viewport={{ once: true }}
 					className="text-center mb-12"
 				>
-					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
 						📅 Upcoming Events
 					</h2>
-					<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 						Stay updated with all the exciting activities and events happening
 						at our school this month.
 					</p>
@@ -133,7 +127,7 @@ export function EventsSection() {
 										viewport={{ once: true }}
 									>
 										<div
-											className={`relative bg-gradient-to-br ${event.bgGradient} dark:${event.darkBgGradient} rounded-3xl p-6 shadow-lg transition-all duration-500 border border-gray-200/50 dark:border-gray-700/50 overflow-hidden`}
+											className={`relative bg-card border border-border rounded-3xl p-6 shadow-lg transition-all duration-500 overflow-hidden`}
 										>
 											{/* Background decoration */}
 											<div className="absolute top-0 right-0 w-20 h-20 opacity-10">
@@ -154,24 +148,24 @@ export function EventsSection() {
 
 												{/* Event Details */}
 												<div className="text-center">
-													<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+													<h3 className="text-xl font-bold text-foreground mb-3">
 														{event.title}
 													</h3>
 
 													<div className="space-y-2 mb-4">
-														<div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+														<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 															<Calendar className="w-4 h-4" />
 															<span>{event.date}</span>
 														</div>
-														<div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+														<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 															<Clock className="w-4 h-4" />
 															<span>{event.time}</span>
 														</div>
-														<div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+														<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 															<MapPin className="w-4 h-4" />
 															<span>{event.location}</span>
 														</div>
-														<div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+														<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 															<Users className="w-4 h-4" />
 															<span>{event.attendees} attendees</span>
 														</div>
@@ -191,15 +185,15 @@ export function EventsSection() {
 						{/* Navigation Buttons */}
 						<button
 							onClick={prevSlide}
-							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-background border border-border p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronLeft className="w-5 h-5 text-foreground" />
 						</button>
 						<button
 							onClick={nextSlide}
-							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-background border border-border p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronRight className="w-5 h-5 text-foreground" />
 						</button>
 
 						{/* Dots Indicator */}
@@ -211,7 +205,7 @@ export function EventsSection() {
 									className={`w-3 h-3 rounded-full transition-all duration-300 ${
 										currentSlide === index
 											? "bg-blue-500 w-8"
-											: "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
+											: "bg-muted hover:bg-muted-foreground/30"
 									}`}
 								/>
 							))}
@@ -234,7 +228,7 @@ export function EventsSection() {
 								className="group"
 							>
 								<div
-									className={`relative bg-gradient-to-br ${event.bgGradient} dark:${event.darkBgGradient} rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 dark:border-gray-700/50 overflow-hidden`}
+									className={`relative bg-card border border-border rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden`}
 								>
 									{/* Background decoration */}
 									<div className="absolute top-0 right-0 w-20 h-20 opacity-10">
@@ -253,27 +247,27 @@ export function EventsSection() {
 
 										{/* Event Details */}
 										<div className="flex-1 min-w-0">
-											<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
+											<h3 className="text-xl font-bold text-foreground mb-2 group-hover:opacity-80 transition-opacity">
 												{event.title}
 											</h3>
 
 											<div className="space-y-2">
-												<div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
 													<Calendar className="w-4 h-4" />
 													<span>{event.date}</span>
 												</div>
 
-												<div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
 													<Clock className="w-4 h-4" />
 													<span>{event.time}</span>
 												</div>
 
-												<div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
 													<MapPin className="w-4 h-4" />
 													<span>{event.location}</span>
 												</div>
 
-												<div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+												<div className="flex items-center gap-2 text-sm text-muted-foreground">
 													<Users className="w-4 h-4" />
 													<span>{event.attendees}+ expected attendees</span>
 												</div>
@@ -281,7 +275,7 @@ export function EventsSection() {
 
 											<Button
 												size="sm"
-												className="mt-4 bg-white/20 hover:bg-white/30 text-gray-700 dark:text-gray-300 border-0"
+												className="mt-4 bg-muted/50 hover:bg-muted text-foreground border-0"
 											>
 												Learn More
 											</Button>
@@ -298,9 +292,9 @@ export function EventsSection() {
 						whileInView={{ opacity: 1, x: 0 }}
 						transition={{ duration: 0.8, delay: 0.2 }}
 						viewport={{ once: true }}
-						className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 shadow-xl border border-gray-200/50 dark:border-gray-700/50"
+						className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-xl"
 					>
-						<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+						<h3 className="text-2xl font-bold text-foreground mb-6 text-center">
 							March 2025
 						</h3>
 
@@ -309,7 +303,7 @@ export function EventsSection() {
 							{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
 								<div
 									key={day}
-									className="p-3 text-center font-semibold text-gray-600 dark:text-gray-400 text-sm"
+									className="p-3 text-center font-semibold text-muted-foreground text-sm"
 								>
 									{day}
 								</div>
@@ -330,8 +324,8 @@ export function EventsSection() {
 													? "bg-blue-600 text-white shadow-lg"
 													: dayData.isEvent
 													? "bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg hover:shadow-xl"
-													: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-												: "text-gray-300 dark:text-gray-600"
+													: "text-foreground hover:bg-muted"
+												: "text-muted-foreground"
 										}
                   `}
 								>
@@ -341,19 +335,15 @@ export function EventsSection() {
 						</div>
 
 						{/* Legend */}
-						<div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+						<div className="mt-6 pt-6 border-t border-border">
 							<div className="space-y-2 text-xs">
 								<div className="flex items-center gap-2">
 									<div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-									<span className="text-gray-600 dark:text-gray-400">
-										Today
-									</span>
+									<span className="text-muted-foreground">Today</span>
 								</div>
 								<div className="flex items-center gap-2">
 									<div className="w-3 h-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full"></div>
-									<span className="text-gray-600 dark:text-gray-400">
-										Events
-									</span>
+									<span className="text-muted-foreground">Events</span>
 								</div>
 							</div>
 						</div>

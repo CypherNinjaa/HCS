@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "system";
+type Theme = "light" | "dark";
 
 type ThemeProviderProps = {
 	children: React.ReactNode;
@@ -13,90 +13,78 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
 	theme: Theme;
 	setTheme: (theme: Theme) => void;
-	systemTheme: "light" | "dark" | undefined;
-	resolvedTheme: "light" | "dark" | undefined;
 };
 
 const initialState: ThemeProviderState = {
-	theme: "system",
+	theme: "light",
 	setTheme: () => null,
-	systemTheme: undefined,
-	resolvedTheme: undefined,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
 	children,
-	defaultTheme = "system",
+	defaultTheme = "light",
 	storageKey = "hcs-theme",
 	...props
 }: ThemeProviderProps) {
-	const [theme, setTheme] = useState<Theme>(() => {
-		if (typeof window !== "undefined") {
-			return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
-		}
-		return defaultTheme;
-	});
-
-	const [systemTheme, setSystemTheme] = useState<
-		"light" | "dark" | undefined
-	>();
-	const [resolvedTheme, setResolvedTheme] = useState<
-		"light" | "dark" | undefined
-	>();
+	const [theme, setTheme] = useState<Theme>(defaultTheme);
+	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
+		setMounted(true);
+		// Load theme from localStorage
+		try {
+			const savedTheme = localStorage.getItem(storageKey) as Theme;
+			if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
+				setTheme(savedTheme);
+			} else {
+				// Detect system preference
+				const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+					.matches
+					? "dark"
+					: "light";
+				setTheme(systemTheme);
+			}
+		} catch (error) {
+			console.warn("Failed to load theme from localStorage:", error);
+		}
+	}, [storageKey]);
+
+	useEffect(() => {
+		if (!mounted) return;
+
 		const root = window.document.documentElement;
 
-		root.removeAttribute("data-theme");
+		// Remove existing theme classes
 		root.classList.remove("light", "dark");
 
-		if (theme === "system") {
-			const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-				.matches
-				? "dark"
-				: "light";
-			setSystemTheme(systemTheme);
-			setResolvedTheme(systemTheme);
-			root.classList.add(systemTheme);
-			return;
-		}
-
-		setResolvedTheme(theme);
+		// Add the current theme class
 		root.classList.add(theme);
-	}, [theme]);
 
-	useEffect(() => {
-		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+		// Update data attribute for CSS
+		root.setAttribute("data-theme", theme);
 
-		const handleChange = () => {
-			const systemTheme = mediaQuery.matches ? "dark" : "light";
-			setSystemTheme(systemTheme);
-
-			if (theme === "system") {
-				setResolvedTheme(systemTheme);
-				const root = window.document.documentElement;
-				root.classList.remove("light", "dark");
-				root.classList.add(systemTheme);
-			}
-		};
-
-		mediaQuery.addEventListener("change", handleChange);
-		handleChange();
-
-		return () => mediaQuery.removeEventListener("change", handleChange);
-	}, [theme]);
+		// Save to localStorage
+		try {
+			localStorage.setItem(storageKey, theme);
+		} catch (error) {
+			console.warn("Failed to save theme to localStorage:", error);
+		}
+	}, [theme, mounted, storageKey]);
 
 	const value = {
 		theme,
-		setTheme: (theme: Theme) => {
-			localStorage.setItem(storageKey, theme);
-			setTheme(theme);
-		},
-		systemTheme,
-		resolvedTheme,
+		setTheme,
 	};
+
+	if (!mounted) {
+		return (
+			<ThemeProviderContext.Provider value={value}>
+				{children}
+			</ThemeProviderContext.Provider>
+		);
+	}
 
 	return (
 		<ThemeProviderContext.Provider {...props} value={value}>

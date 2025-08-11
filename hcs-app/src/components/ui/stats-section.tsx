@@ -71,8 +71,6 @@ export function StatsSection() {
 			label: "Happy Students",
 			emoji: "🎓",
 			gradient: "from-blue-500 to-cyan-500",
-			bgGradient: "from-blue-50 to-cyan-50",
-			darkBgGradient: "from-blue-900/20 to-cyan-900/20",
 		},
 		{
 			icon: BookOpen,
@@ -81,8 +79,6 @@ export function StatsSection() {
 			label: "Expert Teachers",
 			emoji: "👨‍🏫",
 			gradient: "from-purple-500 to-pink-500",
-			bgGradient: "from-purple-50 to-pink-50",
-			darkBgGradient: "from-purple-900/20 to-pink-900/20",
 		},
 		{
 			icon: Trophy,
@@ -91,8 +87,6 @@ export function StatsSection() {
 			label: "Years Excellence",
 			emoji: "🏆",
 			gradient: "from-green-500 to-emerald-500",
-			bgGradient: "from-green-50 to-emerald-50",
-			darkBgGradient: "from-green-900/20 to-emerald-900/20",
 		},
 		{
 			icon: Star,
@@ -101,8 +95,6 @@ export function StatsSection() {
 			label: "Success Rate",
 			emoji: "⭐",
 			gradient: "from-orange-500 to-red-500",
-			bgGradient: "from-orange-50 to-red-50",
-			darkBgGradient: "from-orange-900/20 to-red-900/20",
 		},
 	];
 
@@ -132,15 +124,9 @@ export function StatsSection() {
 		setIsAutoPlaying(false);
 	};
 
-	const StatCard = ({
-		stat,
-		index,
-	}: {
-		stat: (typeof stats)[0];
-		index: number;
-	}) => (
+	const StatCard = ({ stat }: { stat: (typeof stats)[0] }) => (
 		<div
-			className={`relative bg-gradient-to-br ${stat.bgGradient} dark:${stat.darkBgGradient} rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/50 dark:border-gray-700/50 overflow-hidden`}
+			className={`relative bg-card border border-border rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden`}
 		>
 			{/* Background decoration */}
 			<div className="absolute -top-4 -right-4 w-16 h-16 opacity-10">
@@ -165,7 +151,7 @@ export function StatsSection() {
 				</div>
 
 				{/* Label */}
-				<div className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300 mb-2">
+				<div className="text-sm md:text-base font-semibold text-muted-foreground mb-2">
 					{stat.label}
 				</div>
 
@@ -181,7 +167,7 @@ export function StatsSection() {
 	);
 
 	return (
-		<section className="py-16 md:py-24 bg-gray-50 dark:bg-slate-800">
+		<section className="py-16 md:py-24 bg-muted/30">
 			<div className="container mx-auto px-4">
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
@@ -190,10 +176,10 @@ export function StatsSection() {
 					viewport={{ once: true }}
 					className="text-center mb-12"
 				>
-					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
 						📊 Our Impact in Numbers
 					</h2>
-					<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 						These numbers represent our commitment to excellence and the trust
 						our community places in us.
 					</p>
@@ -217,7 +203,7 @@ export function StatsSection() {
 										transition={{ duration: 0.6, delay: index * 0.1 }}
 										viewport={{ once: true }}
 									>
-										<StatCard stat={stat} index={index} />
+										<StatCard stat={stat} />
 									</motion.div>
 								))}
 							</motion.div>
@@ -226,15 +212,15 @@ export function StatsSection() {
 						{/* Navigation Buttons */}
 						<button
 							onClick={prevSlide}
-							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-card p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronLeft className="w-5 h-5 text-muted-foreground" />
 						</button>
 						<button
 							onClick={nextSlide}
-							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-card p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronRight className="w-5 h-5 text-muted-foreground" />
 						</button>
 
 						{/* Dots Indicator */}
@@ -246,7 +232,7 @@ export function StatsSection() {
 									className={`w-3 h-3 rounded-full transition-all duration-300 ${
 										currentSlide === index
 											? "bg-blue-500 w-8"
-											: "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
+											: "bg-muted hover:bg-muted/80"
 									}`}
 								/>
 							))}
@@ -266,7 +252,7 @@ export function StatsSection() {
 							whileHover={{ y: -8, scale: 1.05 }}
 							className="group"
 						>
-							<StatCard stat={stat} index={index} />
+							<StatCard stat={stat} />
 						</motion.div>
 					))}
 				</div>

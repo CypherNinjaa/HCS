@@ -25,8 +25,6 @@ export function StarPerformers() {
 			rank: 1,
 			avatar: "AS",
 			gradient: "from-yellow-400 to-orange-500",
-			bgGradient: "from-yellow-50 to-orange-50",
-			darkBgGradient: "from-yellow-900/20 to-orange-900/20",
 		},
 		{
 			id: 2,
@@ -38,8 +36,6 @@ export function StarPerformers() {
 			rank: 2,
 			avatar: "PP",
 			gradient: "from-pink-400 to-purple-500",
-			bgGradient: "from-pink-50 to-purple-50",
-			darkBgGradient: "from-pink-900/20 to-purple-900/20",
 		},
 		{
 			id: 3,
@@ -51,8 +47,6 @@ export function StarPerformers() {
 			rank: 3,
 			avatar: "RK",
 			gradient: "from-blue-400 to-cyan-500",
-			bgGradient: "from-blue-50 to-cyan-50",
-			darkBgGradient: "from-blue-900/20 to-cyan-900/20",
 		},
 	];
 
@@ -100,18 +94,18 @@ export function StarPerformers() {
 	const getRankColor = (rank: number) => {
 		switch (rank) {
 			case 1:
-				return "text-yellow-500 bg-yellow-100 dark:bg-yellow-900/20";
+				return "text-yellow-500 bg-yellow-100/50 dark:bg-yellow-500/10";
 			case 2:
-				return "text-gray-500 bg-gray-100 dark:bg-gray-900/20";
+				return "text-gray-500 bg-gray-100/50 dark:bg-gray-500/10";
 			case 3:
-				return "text-orange-600 bg-orange-100 dark:bg-orange-900/20";
+				return "text-orange-600 bg-orange-100/50 dark:bg-orange-500/10";
 			default:
-				return "text-blue-500 bg-blue-100 dark:bg-blue-900/20";
+				return "text-blue-500 bg-blue-100/50 dark:bg-blue-500/10";
 		}
 	};
 
 	return (
-		<section className="py-16 md:py-24 bg-gray-50 dark:bg-slate-800">
+		<section className="py-16 md:py-24 bg-muted/30">
 			<div className="container mx-auto px-4">
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
@@ -120,10 +114,10 @@ export function StarPerformers() {
 					viewport={{ once: true }}
 					className="text-center mb-12"
 				>
-					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
 						🌟 Our Star Performers
 					</h2>
-					<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 						Celebrating excellence and achievements of our outstanding students
 						who inspire others to reach for the stars.
 					</p>
@@ -148,7 +142,7 @@ export function StarPerformers() {
 										viewport={{ once: true }}
 									>
 										<div
-											className={`relative bg-gradient-to-br ${student.bgGradient} dark:${student.darkBgGradient} rounded-3xl p-6 shadow-xl transition-all duration-500 border border-white/50 dark:border-gray-700/50 overflow-hidden`}
+											className={`relative bg-card border border-border rounded-3xl p-6 shadow-xl transition-all duration-500 overflow-hidden`}
 										>
 											{/* Rank Badge */}
 											<div
@@ -177,25 +171,25 @@ export function StarPerformers() {
 													</div>
 
 													{/* Initials overlay */}
-													<div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white dark:bg-slate-800 rounded-full border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center shadow-lg">
-														<span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+													<div className="absolute -bottom-2 -right-2 w-8 h-8 bg-background rounded-full border-2 border-border flex items-center justify-center shadow-lg">
+														<span className="text-xs font-bold text-foreground">
 															{student.avatar}
 														</span>
 													</div>
 												</div>
 
 												{/* Student Info */}
-												<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+												<h3 className="text-xl font-bold text-foreground mb-2">
 													{student.name}
 												</h3>
 
-												<p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4">
+												<p className="text-sm font-semibold text-muted-foreground mb-4">
 													{student.grade}
 												</p>
 
 												{/* Achievement */}
-												<div className="bg-white/70 dark:bg-slate-700/70 backdrop-blur-sm rounded-2xl p-3 mb-4">
-													<p className="text-gray-800 dark:text-gray-200 font-medium text-sm">
+												<div className="bg-muted/50 backdrop-blur-sm rounded-2xl p-3 mb-4">
+													<p className="text-foreground font-medium text-sm">
 														{student.achievement}
 													</p>
 												</div>
@@ -203,7 +197,7 @@ export function StarPerformers() {
 												{/* Points and Rank */}
 												<div className="flex items-center justify-between">
 													<div className="text-left">
-														<div className="text-sm text-gray-600 dark:text-gray-400">
+														<div className="text-sm text-muted-foreground">
 															Points
 														</div>
 														<div
@@ -214,7 +208,7 @@ export function StarPerformers() {
 													</div>
 
 													<div className="text-right">
-														<div className="text-sm text-gray-600 dark:text-gray-400">
+														<div className="text-sm text-muted-foreground">
 															Rank
 														</div>
 														<div
@@ -234,15 +228,15 @@ export function StarPerformers() {
 						{/* Navigation Buttons */}
 						<button
 							onClick={prevSlide}
-							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-background border border-border p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronLeft className="w-5 h-5 text-foreground" />
 						</button>
 						<button
 							onClick={nextSlide}
-							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-background border border-border p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronRight className="w-5 h-5 text-foreground" />
 						</button>
 
 						{/* Dots Indicator */}
@@ -254,7 +248,7 @@ export function StarPerformers() {
 									className={`w-3 h-3 rounded-full transition-all duration-300 ${
 										currentSlide === index
 											? "bg-yellow-500 w-8"
-											: "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
+											: "bg-muted hover:bg-muted-foreground/30"
 									}`}
 								/>
 							))}
@@ -275,7 +269,7 @@ export function StarPerformers() {
 							className="group relative"
 						>
 							<div
-								className={`relative bg-gradient-to-br ${student.bgGradient} dark:${student.darkBgGradient} rounded-3xl p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/50 dark:border-gray-700/50 overflow-hidden`}
+								className={`relative bg-card border border-border rounded-3xl p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden`}
 							>
 								{/* Rank Badge */}
 								<div
@@ -306,25 +300,25 @@ export function StarPerformers() {
 										</div>
 
 										{/* Initials overlay for personalization */}
-										<div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white dark:bg-slate-800 rounded-full border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center shadow-lg">
-											<span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+										<div className="absolute -bottom-2 -right-2 w-8 h-8 bg-background rounded-full border-2 border-border flex items-center justify-center shadow-lg">
+											<span className="text-xs font-bold text-foreground">
 												{student.avatar}
 											</span>
 										</div>
 									</div>
 
 									{/* Student Info */}
-									<h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
+									<h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 group-hover:opacity-80 transition-opacity">
 										{student.name}
 									</h3>
 
-									<p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4">
+									<p className="text-sm font-semibold text-muted-foreground mb-4">
 										{student.grade}
 									</p>
 
 									{/* Achievement */}
-									<div className="bg-white/70 dark:bg-slate-700/70 backdrop-blur-sm rounded-2xl p-4 mb-4">
-										<p className="text-gray-800 dark:text-gray-200 font-medium text-sm">
+									<div className="bg-muted/50 backdrop-blur-sm rounded-2xl p-4 mb-4">
+										<p className="text-foreground font-medium text-sm">
 											{student.achievement}
 										</p>
 									</div>
@@ -332,7 +326,7 @@ export function StarPerformers() {
 									{/* Points and Rank */}
 									<div className="flex items-center justify-between">
 										<div className="text-left">
-											<div className="text-sm text-gray-600 dark:text-gray-400">
+											<div className="text-sm text-muted-foreground">
 												Points
 											</div>
 											<div
@@ -343,9 +337,7 @@ export function StarPerformers() {
 										</div>
 
 										<div className="text-right">
-											<div className="text-sm text-gray-600 dark:text-gray-400">
-												Rank
-											</div>
+											<div className="text-sm text-muted-foreground">Rank</div>
 											<div
 												className={`text-lg font-black bg-gradient-to-r ${student.gradient} bg-clip-text text-transparent`}
 											>
@@ -370,7 +362,7 @@ export function StarPerformers() {
 					viewport={{ once: true }}
 					className="text-center mt-12"
 				>
-					<p className="text-gray-600 dark:text-gray-400 mb-6">
+					<p className="text-muted-foreground mb-6">
 						Join our community of achievers and unlock your potential
 					</p>
 					<motion.button
