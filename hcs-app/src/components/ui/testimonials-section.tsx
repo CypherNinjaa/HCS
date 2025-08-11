@@ -69,7 +69,7 @@ export function TestimonialsSection() {
 	};
 
 	return (
-		<section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 dark:from-slate-800 dark:via-purple-900 dark:to-blue-900">
+		<section className="py-16 md:py-24 bg-background">
 			<div className="container mx-auto px-4">
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
@@ -78,10 +78,10 @@ export function TestimonialsSection() {
 					viewport={{ once: true }}
 					className="text-center mb-12"
 				>
-					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
 						💬 What Our Family Says
 					</h2>
-					<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 						Hear from our parents, students, and teachers about their amazing
 						experience with our school community.
 					</p>
@@ -105,10 +105,10 @@ export function TestimonialsSection() {
 										transition={{ duration: 0.6, delay: index * 0.1 }}
 										viewport={{ once: true }}
 									>
-										<div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl transition-all duration-500 border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+										<div className="relative bg-card/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl transition-all duration-500 border border-border/50 overflow-hidden">
 											{/* Quote Icon */}
 											<div className="absolute top-4 right-4 opacity-10">
-												<Quote className="w-12 h-12 text-gray-400" />
+												<Quote className="w-12 h-12 text-muted-foreground" />
 											</div>
 
 											{/* Header */}
@@ -119,17 +119,17 @@ export function TestimonialsSection() {
 													<span className="text-xl">{testimonial.avatar}</span>
 												</div>
 												<div>
-													<h4 className="font-bold text-gray-900 dark:text-white text-lg">
+													<h4 className="font-bold text-foreground text-lg">
 														{testimonial.name}
 													</h4>
-													<p className="text-sm text-gray-600 dark:text-gray-400">
+													<p className="text-sm text-muted-foreground">
 														{testimonial.role}
 													</p>
 												</div>
 											</div>
 
 											{/* Content */}
-											<blockquote className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4 italic">
+											<blockquote className="text-foreground leading-relaxed mb-4 italic">
 												&ldquo;{testimonial.content}&rdquo;
 											</blockquote>
 
@@ -153,15 +153,15 @@ export function TestimonialsSection() {
 						{/* Navigation Buttons */}
 						<button
 							onClick={prevSlide}
-							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-card p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronLeft className="w-5 h-5 text-muted-foreground" />
 						</button>
 						<button
 							onClick={nextSlide}
-							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
+							className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-card p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-10"
 						>
-							<ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+							<ChevronRight className="w-5 h-5 text-muted-foreground" />
 						</button>
 
 						{/* Dots Indicator */}
@@ -193,10 +193,10 @@ export function TestimonialsSection() {
 							whileHover={{ y: -8, scale: 1.02 }}
 							className="group"
 						>
-							<div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+							<div className="relative bg-card/90 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-border/50 overflow-hidden">
 								{/* Quote Icon */}
 								<div className="absolute top-4 right-4 opacity-10">
-									<Quote className="w-12 h-12 text-gray-400" />
+									<Quote className="w-12 h-12 text-muted-foreground" />
 								</div>
 
 								{/* Header */}
@@ -209,7 +209,7 @@ export function TestimonialsSection() {
 										</span>
 									</div>
 									<div>
-										<h4 className="font-bold text-gray-900 dark:text-white text-lg">
+										<h4 className="font-bold text-foreground text-lg">
 											{testimonial.name}
 										</h4>
 										<p className="text-sm text-gray-600 dark:text-gray-400">

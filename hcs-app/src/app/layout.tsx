@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/lib/theme-provider";
+import { ThemeProvider } from "@/lib/theme-provider-new";
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -23,6 +23,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+	metadataBase: new URL(
+		process.env.NODE_ENV === "production"
+			? "https://happychildschool.edu"
+			: "http://localhost:3000"
+	),
 	title: "Happy Child School - Excellence in Education",
 	description:
 		"A comprehensive school management system providing quality education with modern facilities and innovative teaching methods designed for the digital generation.",
@@ -80,6 +85,7 @@ export const metadata: Metadata = {
 	},
 	icons: {
 		icon: [
+			{ url: "/favicon.svg", type: "image/svg+xml" },
 			{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
 			{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
 		],
@@ -104,6 +110,19 @@ export default function RootLayout({
 					rel="preconnect"
 					href="https://fonts.gstatic.com"
 					crossOrigin="anonymous"
+				/>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
+							(function() {
+								try {
+									var theme = localStorage.getItem('hcs-theme') || 'system';
+									var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+									document.documentElement.classList.add(isDark ? 'dark' : 'light');
+								} catch (e) {}
+							})();
+						`,
+					}}
 				/>
 			</head>
 			<body className="min-h-screen bg-background font-sans antialiased">

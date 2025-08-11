@@ -27,7 +27,7 @@ const galleryItems: GalleryItem[] = [
 	{
 		id: 1,
 		type: "image",
-		src: "/api/placeholder/800/600",
+		src: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&h=600&fit=crop&crop=center",
 		title: "Modern Science Laboratory",
 		description: "State-of-the-art equipment for hands-on learning",
 		location: "Science Building, 2nd Floor",
@@ -36,7 +36,7 @@ const galleryItems: GalleryItem[] = [
 	{
 		id: 2,
 		type: "image",
-		src: "/api/placeholder/800/600",
+		src: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&crop=center",
 		title: "Annual Sports Day 2024",
 		description: "Students showcasing their athletic talents",
 		location: "Main Sports Ground",
@@ -45,7 +45,7 @@ const galleryItems: GalleryItem[] = [
 	{
 		id: 3,
 		type: "video",
-		src: "/api/placeholder/800/600",
+		src: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=600&fit=crop&crop=center",
 		title: "Art & Craft Workshop",
 		description: "Creative minds at work in our art studio",
 		location: "Creative Arts Center",
@@ -54,7 +54,7 @@ const galleryItems: GalleryItem[] = [
 	{
 		id: 4,
 		type: "image",
-		src: "/api/placeholder/800/600",
+		src: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=600&fit=crop&crop=center",
 		title: "Digital Learning Hub",
 		description: "Interactive smart classrooms with latest technology",
 		location: "Technology Wing",
@@ -63,7 +63,7 @@ const galleryItems: GalleryItem[] = [
 	{
 		id: 5,
 		type: "image",
-		src: "/api/placeholder/800/600",
+		src: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop&crop=center",
 		title: "National Award Winners",
 		description: "Our students excelling at national competitions",
 		location: "Assembly Hall",
@@ -72,7 +72,7 @@ const galleryItems: GalleryItem[] = [
 	{
 		id: 6,
 		type: "image",
-		src: "/api/placeholder/800/600",
+		src: "https://images.unsplash.com/photo-1460518451285-97b6aa326961?w=800&h=600&fit=crop&crop=center",
 		title: "Cultural Festival Performance",
 		description: "Vibrant cultural performances by talented students",
 		location: "Main Auditorium",
@@ -87,6 +87,9 @@ const categories = [
 	{ key: "activity", label: "Activities", icon: Play },
 	{ key: "achievement", label: "Achievements", icon: Video },
 ];
+
+const fallbackImageUrl =
+	"https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&h=600&fit=crop&crop=center&auto=format&q=75";
 
 export function GalleryCarousel() {
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -133,10 +136,25 @@ export function GalleryCarousel() {
 		setCurrentIndex(index);
 	};
 
+	const handleImageError = (
+		e: React.SyntheticEvent<HTMLImageElement, Event>
+	) => {
+		const img = e.currentTarget;
+
+		// Check if this is already the fallback image
+		if (img.src.includes(fallbackImageUrl)) {
+			console.warn("Fallback image also failed to load");
+			return;
+		}
+
+		console.warn("Image failed to load, switching to fallback:", img.src);
+		img.src = fallbackImageUrl;
+	};
+
 	if (filteredItems.length === 0) {
 		return (
 			<div className="text-center py-12">
-				<p className="text-gray-500">No items found in this category</p>
+				<p className="text-muted-foreground">No items found in this category</p>
 			</div>
 		);
 	}
@@ -144,7 +162,7 @@ export function GalleryCarousel() {
 	const currentItem = filteredItems[currentIndex];
 
 	return (
-		<section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+		<section className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
 			<div className="max-w-7xl mx-auto">
 				{/* Section Header */}
 				<motion.div
@@ -157,7 +175,7 @@ export function GalleryCarousel() {
 					<h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent mb-4">
 						School Gallery
 					</h2>
-					<p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+					<p className="text-lg text-muted-foreground max-w-3xl mx-auto">
 						Explore our vibrant school life through this visual journey of
 						facilities, events, and achievements
 					</p>
@@ -169,7 +187,7 @@ export function GalleryCarousel() {
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
 					transition={{ duration: 0.6, delay: 0.2 }}
-					className="flex flex-wrap justify-center gap-3 mb-8"
+					className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 px-2"
 				>
 					{categories.map((category) => {
 						const IconComponent = category.icon;
@@ -177,14 +195,17 @@ export function GalleryCarousel() {
 							<button
 								key={category.key}
 								onClick={() => setSelectedCategory(category.key)}
-								className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+								className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 ${
 									selectedCategory === category.key
 										? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg scale-105"
-										: "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-600"
+										: "bg-card text-muted-foreground hover:bg-muted border border-border"
 								}`}
 							>
-								<IconComponent className="w-4 h-4" />
-								{category.label}
+								<IconComponent className="w-3 h-3 sm:w-4 sm:h-4" />
+								<span className="hidden sm:inline">{category.label}</span>
+								<span className="sm:hidden">
+									{category.label.split(" ")[0]}
+								</span>
 							</button>
 						);
 					})}
@@ -199,7 +220,7 @@ export function GalleryCarousel() {
 							whileInView={{ opacity: 1, scale: 1 }}
 							viewport={{ once: true }}
 							transition={{ duration: 0.6, delay: 0.3 }}
-							className="relative rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-slate-800"
+							className="relative rounded-2xl overflow-hidden shadow-2xl bg-card"
 						>
 							<div className="relative h-96 lg:h-[500px]">
 								<AnimatePresence mode="wait">
@@ -216,6 +237,9 @@ export function GalleryCarousel() {
 											alt={currentItem.title}
 											fill
 											className="object-cover"
+											priority
+											sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+											onError={handleImageError}
 										/>
 										<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
@@ -275,16 +299,16 @@ export function GalleryCarousel() {
 							</div>
 
 							{/* Thumbnails */}
-							<div className="p-6 bg-white dark:bg-slate-800">
+							<div className="p-6 bg-card">
 								<div className="flex gap-3 overflow-x-auto pb-2">
 									{filteredItems.map((item, index) => (
 										<button
 											key={item.id}
 											onClick={() => goToSlide(index)}
-											className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+											className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
 												index === currentIndex
 													? "border-blue-500 scale-105"
-													: "border-gray-200 dark:border-slate-600 hover:border-blue-300"
+													: "border-border hover:border-primary/50"
 											}`}
 										>
 											<Image
@@ -292,6 +316,8 @@ export function GalleryCarousel() {
 												alt={item.title}
 												fill
 												className="object-cover"
+												sizes="80px"
+												onError={handleImageError}
 											/>
 										</button>
 									))}
@@ -302,22 +328,25 @@ export function GalleryCarousel() {
 
 					{/* Mobile View - Carousel Cards */}
 					<div className="md:hidden">
-						<div className="relative">
+						<div className="relative px-4">
 							<div className="overflow-hidden rounded-2xl">
 								<motion.div
 									className="flex transition-transform duration-500 ease-out"
 									style={{ transform: `translateX(-${currentIndex * 100}%)` }}
 								>
 									{filteredItems.map((item) => (
-										<div key={item.id} className="w-full flex-shrink-0">
-											<div className="relative h-80 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-xl mx-2">
-												<Image
-													src={item.src}
-													alt={item.title}
-													width={800}
-													height={192}
-													className="w-full h-48 object-cover"
-												/>
+										<div key={item.id} className="w-full flex-shrink-0 px-2">
+											<div className="relative h-80 bg-card rounded-2xl overflow-hidden shadow-xl">
+												<div className="relative h-48 w-full">
+													<Image
+														src={item.src}
+														alt={item.title}
+														fill
+														className="object-cover"
+														sizes="(max-width: 768px) 100vw"
+														onError={handleImageError}
+													/>
+												</div>
 												<div className="absolute top-2 right-2">
 													{item.type === "video" ? (
 														<div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
@@ -332,16 +361,16 @@ export function GalleryCarousel() {
 													)}
 												</div>
 												<div className="p-4">
-													<h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+													<h3 className="text-lg font-bold text-foreground mb-2 line-clamp-1">
 														{item.title}
 													</h3>
-													<p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+													<p className="text-sm text-muted-foreground mb-2 line-clamp-2">
 														{item.description}
 													</p>
 													{item.location && (
-														<div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-															<MapPin className="w-3 h-3" />
-															{item.location}
+														<div className="flex items-center gap-1 text-xs text-muted-foreground">
+															<MapPin className="w-3 h-3 flex-shrink-0" />
+															<span className="truncate">{item.location}</span>
 														</div>
 													)}
 												</div>
@@ -357,11 +386,12 @@ export function GalleryCarousel() {
 									<button
 										key={index}
 										onClick={() => goToSlide(index)}
-										className={`w-3 h-3 rounded-full transition-all duration-300 ${
+										className={`w-3 h-3 rounded-full transition-all duration-300 touch-target ${
 											index === currentIndex
 												? "bg-blue-500 scale-125"
-												: "bg-gray-300 dark:bg-slate-600 hover:bg-blue-300"
+												: "bg-muted hover:bg-primary/20"
 										}`}
+										style={{ minWidth: "44px", minHeight: "44px" }}
 									/>
 								))}
 							</div>
@@ -370,14 +400,17 @@ export function GalleryCarousel() {
 							<div className="flex justify-center mt-4">
 								<button
 									onClick={() => setIsPlaying(!isPlaying)}
-									className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-all duration-300"
+									className="flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-all duration-300 shadow-lg touch-target"
+									style={{ minWidth: "44px", minHeight: "44px" }}
 								>
 									{isPlaying ? (
 										<Pause className="w-4 h-4" />
 									) : (
 										<Play className="w-4 h-4" />
 									)}
-									{isPlaying ? "Pause" : "Play"}
+									<span className="text-sm font-medium">
+										{isPlaying ? "Pause" : "Play"}
+									</span>
 								</button>
 							</div>
 						</div>
@@ -402,13 +435,13 @@ export function GalleryCarousel() {
 						return (
 							<div
 								key={index}
-								className="text-center p-4 bg-white dark:bg-slate-800 rounded-xl shadow-lg"
+								className="text-center p-4 bg-card rounded-xl shadow-lg"
 							>
 								<IconComponent className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-								<div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+								<div className="text-2xl font-bold text-foreground mb-1">
 									{stat.value}
 								</div>
-								<div className="text-sm text-gray-600 dark:text-gray-400">
+								<div className="text-sm text-muted-foreground">
 									{stat.label}
 								</div>
 							</div>

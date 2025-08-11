@@ -32,24 +32,40 @@ export function ThemeProvider({
 	storageKey = "hcs-theme",
 	...props
 }: ThemeProviderProps) {
-	const [theme, setTheme] = useState<Theme>(() => {
-		if (typeof window !== "undefined") {
-			return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
-		}
-		return defaultTheme;
-	});
-
+	const [theme, setTheme] = useState<Theme>(defaultTheme);
 	const [systemTheme, setSystemTheme] = useState<
 		"light" | "dark" | undefined
 	>();
 	const [resolvedTheme, setResolvedTheme] = useState<
 		"light" | "dark" | undefined
 	>();
+	const [mounted, setMounted] = useState(false);
 
+	// Initialize theme from localStorage on mount
 	useEffect(() => {
+		setMounted(true);
+		try {
+			const savedTheme = localStorage.getItem(storageKey) as Theme;
+			if (
+				savedTheme &&
+				(savedTheme === "light" ||
+					savedTheme === "dark" ||
+					savedTheme === "system")
+			) {
+				setTheme(savedTheme);
+			}
+		} catch (error) {
+			console.warn("Failed to load theme from localStorage:", error);
+		}
+	}, [storageKey]);
+
+	// Apply theme to DOM
+	useEffect(() => {
+		if (!mounted) return;
+
 		const root = window.document.documentElement;
 
-		root.removeAttribute("data-theme");
+		// Remove all theme classes first
 		root.classList.remove("light", "dark");
 
 		if (theme === "system") {
@@ -65,9 +81,12 @@ export function ThemeProvider({
 
 		setResolvedTheme(theme);
 		root.classList.add(theme);
-	}, [theme]);
+	}, [theme, mounted]);
 
+	// Listen for system theme changes
 	useEffect(() => {
+		if (!mounted) return;
+
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 		const handleChange = () => {
@@ -86,17 +105,30 @@ export function ThemeProvider({
 		handleChange();
 
 		return () => mediaQuery.removeEventListener("change", handleChange);
-	}, [theme]);
+	}, [theme, mounted]);
 
 	const value = {
 		theme,
 		setTheme: (theme: Theme) => {
-			localStorage.setItem(storageKey, theme);
+			try {
+				localStorage.setItem(storageKey, theme);
+			} catch (error) {
+				console.warn("Failed to save theme to localStorage:", error);
+			}
 			setTheme(theme);
 		},
 		systemTheme,
 		resolvedTheme,
 	};
+
+	// Prevent hydration mismatch by returning a neutral state during SSR
+	if (!mounted) {
+		return (
+			<ThemeProviderContext.Provider value={initialState}>
+				{children}
+			</ThemeProviderContext.Provider>
+		);
+	}
 
 	return (
 		<ThemeProviderContext.Provider {...props} value={value}>
