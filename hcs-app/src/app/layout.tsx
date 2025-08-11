@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/lib/theme-provider";
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -14,14 +15,17 @@ export const viewport: Viewport = {
 	initialScale: 1,
 	maximumScale: 5,
 	userScalable: true,
-	themeColor: "#417AF5",
-	colorScheme: "light",
+	themeColor: [
+		{ media: "(prefers-color-scheme: light)", color: "#417AF5" },
+		{ media: "(prefers-color-scheme: dark)", color: "#5a8bff" },
+	],
+	colorScheme: "light dark",
 };
 
 export const metadata: Metadata = {
 	title: "Happy Child School - Excellence in Education",
 	description:
-		"A comprehensive school management system providing quality education with modern facilities and innovative teaching methods.",
+		"A comprehensive school management system providing quality education with modern facilities and innovative teaching methods designed for the digital generation.",
 	keywords: [
 		"school",
 		"education",
@@ -31,6 +35,8 @@ export const metadata: Metadata = {
 		"academic excellence",
 		"digital learning",
 		"school portal",
+		"mobile-first education",
+		"student engagement",
 	],
 	authors: [
 		{ name: "Happy Child School", url: "https://happychildschool.edu" },
@@ -45,12 +51,21 @@ export const metadata: Metadata = {
 		description:
 			"Leading educational institution providing comprehensive learning experience with modern facilities and innovative teaching methods.",
 		siteName: "Happy Child School",
+		images: [
+			{
+				url: "/og-image.jpg",
+				width: 1200,
+				height: 630,
+				alt: "Happy Child School - Excellence in Education",
+			},
+		],
 	},
 	twitter: {
 		card: "summary_large_image",
 		title: "Happy Child School - Excellence in Education",
 		description:
 			"Leading educational institution providing comprehensive learning experience with modern facilities and innovative teaching methods.",
+		images: ["/og-image.jpg"],
 	},
 	robots: {
 		index: true,
@@ -64,10 +79,16 @@ export const metadata: Metadata = {
 		},
 	},
 	icons: {
-		icon: "/favicon.ico",
-		shortcut: "/favicon-16x16.png",
-		apple: "/apple-touch-icon.png",
+		icon: [
+			{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+			{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+		],
+		shortcut: "/favicon.ico",
+		apple: [
+			{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+		],
 	},
+	manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -86,9 +107,11 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className="min-h-screen bg-background font-sans antialiased">
-				<div className="relative flex min-h-screen flex-col">
-					<main className="flex-1">{children}</main>
-				</div>
+				<ThemeProvider defaultTheme="system" storageKey="hcs-theme">
+					<div className="relative flex min-h-screen flex-col">
+						<main className="flex-1">{children}</main>
+					</div>
+				</ThemeProvider>
 			</body>
 		</html>
 	);
