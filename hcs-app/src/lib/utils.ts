@@ -1,0 +1,178 @@
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+	return twMerge(clsx(inputs));
+}
+
+/**
+ * Format date to readable string
+ */
+export function formatDate(date: Date | string): string {
+	const d = new Date(date);
+	return d.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+}
+
+/**
+ * Format date and time
+ */
+export function formatDateTime(date: Date | string): string {
+	const d = new Date(date);
+	return d.toLocaleString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+}
+
+/**
+ * Format currency
+ */
+export function formatCurrency(amount: number | string): string {
+	const num = typeof amount === "string" ? parseFloat(amount) : amount;
+	return new Intl.NumberFormat("en-IN", {
+		style: "currency",
+		currency: "INR",
+	}).format(num);
+}
+
+/**
+ * Calculate percentage
+ */
+export function calculatePercentage(obtained: number, total: number): number {
+	if (total === 0) return 0;
+	return Math.round((obtained / total) * 100);
+}
+
+/**
+ * Get grade from percentage
+ */
+export function getGrade(percentage: number): string {
+	if (percentage >= 90) return "A+";
+	if (percentage >= 80) return "A";
+	if (percentage >= 70) return "B+";
+	if (percentage >= 60) return "B";
+	if (percentage >= 50) return "C+";
+	if (percentage >= 40) return "C";
+	if (percentage >= 33) return "D";
+	return "F";
+}
+
+/**
+ * Get grade color for UI
+ */
+export function getGradeColor(grade: string): string {
+	switch (grade) {
+		case "A+":
+		case "A":
+			return "text-green-600";
+		case "B+":
+		case "B":
+			return "text-blue-600";
+		case "C+":
+		case "C":
+			return "text-yellow-600";
+		case "D":
+			return "text-orange-600";
+		case "F":
+			return "text-red-600";
+		default:
+			return "text-gray-600";
+	}
+}
+
+/**
+ * Generate random color for avatars
+ */
+export function generateAvatarColor(): string {
+	const colors = [
+		"bg-red-500",
+		"bg-blue-500",
+		"bg-green-500",
+		"bg-yellow-500",
+		"bg-purple-500",
+		"bg-pink-500",
+		"bg-indigo-500",
+		"bg-teal-500",
+	];
+	return colors[Math.floor(Math.random() * colors.length)];
+}
+
+/**
+ * Get initials from name
+ */
+export function getInitials(name: string): string {
+	return name
+		.split(" ")
+		.map((n) => n[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
+}
+
+/**
+ * Truncate text
+ */
+export function truncateText(text: string, length: number): string {
+	if (text.length <= length) return text;
+	return text.slice(0, length) + "...";
+}
+
+/**
+ * Sleep utility for demos
+ */
+export function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Check if date is today
+ */
+export function isToday(date: Date | string): boolean {
+	const today = new Date();
+	const d = new Date(date);
+	return (
+		d.getDate() === today.getDate() &&
+		d.getMonth() === today.getMonth() &&
+		d.getFullYear() === today.getFullYear()
+	);
+}
+
+/**
+ * Check if date is in current week
+ */
+export function isThisWeek(date: Date | string): boolean {
+	const today = new Date();
+	const d = new Date(date);
+	const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+	const endOfWeek = new Date(
+		today.setDate(today.getDate() - today.getDay() + 6)
+	);
+	return d >= startOfWeek && d <= endOfWeek;
+}
+
+/**
+ * Get time difference in a readable format
+ */
+export function getTimeAgo(date: Date | string): string {
+	const now = new Date();
+	const d = new Date(date);
+	const diffInSeconds = Math.floor((now.getTime() - d.getTime()) / 1000);
+
+	if (diffInSeconds < 60) return "Just now";
+	if (diffInSeconds < 3600)
+		return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+	if (diffInSeconds < 86400)
+		return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+	if (diffInSeconds < 2592000)
+		return `${Math.floor(diffInSeconds / 86400)} days ago`;
+	if (diffInSeconds < 31536000)
+		return `${Math.floor(diffInSeconds / 2592000)} months ago`;
+	return `${Math.floor(diffInSeconds / 31536000)} years ago`;
+}
