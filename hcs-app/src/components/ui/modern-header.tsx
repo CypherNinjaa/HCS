@@ -5,11 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, GraduationCap } from "lucide-react";
 
 export function ModernHeader() {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const pathname = usePathname();
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -62,19 +64,22 @@ export function ModernHeader() {
 
 					{/* Desktop Navigation */}
 					<nav className="hidden lg:flex items-center space-x-1">
-						{navItems.map((item) => (
-							<Link
-								key={item.name}
-								href={item.href}
-								className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:bg-muted ${
-									item.href === "/"
-										? "text-primary bg-muted"
-										: "text-foreground hover:text-primary"
-								}`}
-							>
-								{item.name}
-							</Link>
-						))}
+						{navItems.map((item) => {
+							const isActive = pathname === item.href;
+							return (
+								<Link
+									key={item.name}
+									href={item.href}
+									className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:bg-muted ${
+										isActive
+											? "text-primary bg-muted"
+											: "text-foreground hover:text-primary"
+									}`}
+								>
+									{item.name}
+								</Link>
+							);
+						})}
 					</nav>
 
 					{/* Right Section */}
@@ -129,20 +134,23 @@ export function ModernHeader() {
 					>
 						<div className="container mx-auto px-4 py-4">
 							<nav className="space-y-2">
-								{navItems.map((item) => (
-									<Link
-										key={item.name}
-										href={item.href}
-										className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
-											item.href === "/"
-												? "text-primary bg-muted"
-												: "text-foreground hover:bg-muted"
-										}`}
-										onClick={() => setIsMobileMenuOpen(false)}
-									>
-										{item.name}
-									</Link>
-								))}
+								{navItems.map((item) => {
+									const isActive = pathname === item.href;
+									return (
+										<Link
+											key={item.name}
+											href={item.href}
+											className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
+												isActive
+													? "text-primary bg-muted"
+													: "text-foreground hover:bg-muted"
+											}`}
+											onClick={() => setIsMobileMenuOpen(false)}
+										>
+											{item.name}
+										</Link>
+									);
+								})}
 							</nav>
 
 							<div className="flex flex-col space-y-2 pt-4 border-t border-border">
