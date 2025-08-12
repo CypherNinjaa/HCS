@@ -26,6 +26,7 @@ export function ModernHeader() {
 		{ name: "Home", href: "/" },
 		{ name: "About", href: "/about" },
 		{ name: "Academics", href: "/academics" },
+		{ name: "Co-curricular", href: "/co-curricular" },
 		{ name: "Facilities", href: "/facilities" },
 		{ name: "Admissions", href: "/admissions" },
 		{ name: "Contact", href: "/contact" },
