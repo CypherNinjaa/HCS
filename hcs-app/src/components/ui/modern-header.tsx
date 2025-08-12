@@ -29,7 +29,7 @@ export function ModernHeader() {
 		{ name: "Co-curricular", href: "/co-curricular" },
 		{ name: "Facilities", href: "/facilities" },
 		{ name: "Admissions", href: "/admissions" },
-		{ name: "Contact", href: "/contact" },
+		{ name: "News-Updates", href: "/news" },
 	];
 
 	return (
