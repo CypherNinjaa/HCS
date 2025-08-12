@@ -193,21 +193,48 @@ export function StaffDirectory() {
 				? (person as NonTeachingStaff)
 				: null;
 
+		const handleCardClick = () => {
+			setIsFlipped(!isFlipped);
+		};
+
 		return (
 			<motion.div
-				className="relative w-full h-80 perspective-1000"
-				onHoverStart={() => setIsFlipped(true)}
-				onHoverEnd={() => setIsFlipped(false)}
+				className="relative w-full h-80 mx-auto"
+				style={{ perspective: "1000px" }}
 				whileHover={{ y: -8 }}
 			>
 				<motion.div
-					className="w-full h-full relative preserve-3d cursor-pointer"
+					className="w-full h-full relative cursor-pointer"
+					style={{
+						transformStyle: "preserve-3d",
+						zIndex: isFlipped ? 10 : 1,
+					}}
 					animate={{ rotateY: isFlipped ? 180 : 0 }}
 					transition={{ duration: 0.6 }}
+					onClick={handleCardClick}
 				>
 					{/* Front Side */}
-					<div className="absolute inset-0 w-full h-full backface-hidden">
-						<div className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 border border-border/50 shadow-lg h-full flex flex-col items-center justify-center text-center">
+					<div
+						className="absolute inset-0 w-full h-full"
+						style={{
+							transform: "rotateY(0deg)",
+							backfaceVisibility: "hidden",
+							WebkitBackfaceVisibility: "hidden",
+							zIndex: 2,
+						}}
+					>
+						<div className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 border border-border/50 shadow-lg h-full flex flex-col items-center justify-center text-center relative">
+							{/* Small Contact Button - Top Right */}
+							<motion.button
+								whileHover={{ scale: 1.1 }}
+								whileTap={{ scale: 0.9 }}
+								className="absolute top-4 right-4 w-8 h-8 bg-primary/20 hover:bg-primary hover:text-white text-primary rounded-full flex items-center justify-center transition-all duration-300 shadow-md"
+								onClick={(e) => e.stopPropagation()}
+								title="Contact"
+							>
+								<Mail className="w-4 h-4" />
+							</motion.button>
+
 							{/* Avatar */}
 							<div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
 								{person.image}
@@ -246,19 +273,42 @@ export function StaffDirectory() {
 								</div>
 							)}
 
-							{/* Hover Indicator */}
+							{/* Click Indicator */}
 							<div className="text-xs text-muted-foreground opacity-70">
-								Hover for details
+								Click for details
 							</div>
 						</div>
 					</div>
 
 					{/* Back Side */}
 					<div
-						className="absolute inset-0 w-full h-full backface-hidden rotate-y-180"
-						style={{ transform: "rotateY(180deg)" }}
+						className="absolute inset-0 w-full h-full"
+						style={{
+							transform: "rotateY(180deg)",
+							backfaceVisibility: "hidden",
+							WebkitBackfaceVisibility: "hidden",
+							zIndex: 3,
+						}}
 					>
-						<div className="bg-gradient-to-br from-primary/10 to-secondary/10 backdrop-blur-sm rounded-3xl p-6 border border-primary/20 shadow-lg h-full">
+						<div className="bg-gradient-to-br from-primary/10 to-secondary/10 backdrop-blur-sm rounded-3xl p-6 border border-primary/20 shadow-lg h-full relative flex flex-col">
+							{/* Small Contact Button - Top Left */}
+							<motion.button
+								whileHover={{ scale: 1.1 }}
+								whileTap={{ scale: 0.9 }}
+								className="absolute top-4 left-4 w-8 h-8 bg-primary/20 hover:bg-primary hover:text-white text-primary rounded-full flex items-center justify-center transition-all duration-300 shadow-md"
+								onClick={(e) => e.stopPropagation()}
+								title="Contact"
+							>
+								<Mail className="w-4 h-4" />
+							</motion.button>
+
+							{/* Back indicator */}
+							<div className="absolute top-4 right-4 z-10">
+								<div className="text-xs text-muted-foreground opacity-70 bg-background/50 px-2 py-1 rounded">
+									Click to return
+								</div>
+							</div>
+
 							{/* Header */}
 							<div className="text-center mb-4">
 								<h3 className="text-lg font-bold text-foreground mb-1">
@@ -273,8 +323,8 @@ export function StaffDirectory() {
 								</p>
 							</div>
 
-							{/* Details */}
-							<div className="space-y-3 text-sm">
+							{/* Details - with flex-1 to take available space */}
+							<div className="space-y-3 text-sm flex-1">
 								<div>
 									<span className="font-semibold text-foreground">
 										Education:
@@ -317,18 +367,6 @@ export function StaffDirectory() {
 										</ul>
 									</div>
 								)}
-							</div>
-
-							{/* Contact Button */}
-							<div className="absolute bottom-6 left-6 right-6">
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									className="w-full bg-primary/20 hover:bg-primary hover:text-white text-primary border border-primary/50 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2"
-								>
-									<Mail className="w-4 h-4" />
-									Contact
-								</motion.button>
 							</div>
 						</div>
 					</div>
@@ -405,7 +443,7 @@ export function StaffDirectory() {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
-					className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto"
+					className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto"
 				>
 					{(activeTab === "teachers" ? teachers : nonTeachingStaff).map(
 						(person, index) => (
@@ -415,6 +453,8 @@ export function StaffDirectory() {
 								whileInView={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: index * 0.1 }}
 								viewport={{ once: true }}
+								className="relative z-0 p-2"
+								style={{ isolation: "isolate" }}
 							>
 								<FlipCard
 									person={person}
@@ -492,22 +532,6 @@ export function StaffDirectory() {
 					</div>
 				</motion.div>
 			</div>
-
-			<style jsx>{`
-				.perspective-1000 {
-					perspective: 1000px;
-				}
-				.preserve-3d {
-					transform-style: preserve-3d;
-				}
-				.backface-hidden {
-					backface-visibility: hidden;
-					-webkit-backface-visibility: hidden;
-				}
-				.rotate-y-180 {
-					transform: rotateY(180deg);
-				}
-			`}</style>
 		</section>
 	);
 }
