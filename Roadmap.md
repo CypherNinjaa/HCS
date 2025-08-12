@@ -169,7 +169,7 @@ role-based access. Frontend and backend will be integrated for smooth, real-time
 ## 15. Admin Panel
 
 - Central dashboard with KPI widgets
-- Live analytics and visualizations (connected via Supabase)
+- Live analytics and visualizations 
 - Manage students, teachers, classes, fees, and exams
 - Live fee collection tracker
   - Currently supports cash payments only
