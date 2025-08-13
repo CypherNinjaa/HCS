@@ -62,6 +62,12 @@ function AnimatedCounter({ end, duration = 2, suffix = "" }: CounterProps) {
 export function StatsSection() {
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+	const [mounted, setMounted] = useState(false);
+
+	// Prevent hydration mismatch
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	const stats = [
 		{
@@ -100,14 +106,14 @@ export function StatsSection() {
 
 	// Auto-play carousel on mobile
 	useEffect(() => {
-		if (!isAutoPlaying) return;
+		if (!mounted || !isAutoPlaying) return;
 
 		const interval = setInterval(() => {
 			setCurrentSlide((prev) => (prev + 1) % stats.length);
 		}, 3000);
 
 		return () => clearInterval(interval);
-	}, [isAutoPlaying, stats.length]);
+	}, [isAutoPlaying, stats.length, mounted]);
 
 	const nextSlide = () => {
 		setCurrentSlide((prev) => (prev + 1) % stats.length);
@@ -169,21 +175,35 @@ export function StatsSection() {
 	return (
 		<section className="py-16 md:py-24 bg-muted/30">
 			<div className="container mx-auto px-4">
-				<motion.div
-					initial={{ opacity: 0, y: 30 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8 }}
-					viewport={{ once: true }}
-					className="text-center mb-12"
-				>
-					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
-						📊 Our Impact in Numbers
-					</h2>
-					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						These numbers represent our commitment to excellence and the trust
-						our community places in us.
-					</p>
-				</motion.div>
+				{mounted && (
+					<motion.div
+						initial={{ opacity: 0, y: 30 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.8 }}
+						viewport={{ once: true }}
+						className="text-center mb-12"
+					>
+						<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
+							📊 Our Impact in Numbers
+						</h2>
+						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+							These numbers represent our commitment to excellence and the trust
+							our community places in us.
+						</p>
+					</motion.div>
+				)}
+
+				{!mounted && (
+					<div className="text-center mb-12">
+						<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
+							📊 Our Impact in Numbers
+						</h2>
+						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+							These numbers represent our commitment to excellence and the trust
+							our community places in us.
+						</p>
+					</div>
+				)}
 
 				{/* Mobile Carousel View */}
 				<div className="block md:hidden">
