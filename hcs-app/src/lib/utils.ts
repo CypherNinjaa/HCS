@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Format date to readable string
+ * Format date to readable string (hydration-safe)
  */
 export function formatDate(date: Date | string): string {
 	const d = new Date(date);
@@ -15,6 +15,21 @@ export function formatDate(date: Date | string): string {
 		month: "long",
 		day: "numeric",
 	});
+}
+
+/**
+ * Format date for blog posts (hydration-safe)
+ */
+export function formatBlogDate(date: Date | string): string {
+	const d = new Date(date);
+	// Use a consistent format that works on both server and client
+	const options: Intl.DateTimeFormatOptions = {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+		timeZone: "UTC", // Ensures consistent formatting
+	};
+	return d.toLocaleDateString("en-US", options);
 }
 
 /**

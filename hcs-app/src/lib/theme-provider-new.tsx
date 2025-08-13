@@ -32,7 +32,26 @@ export function ThemeProvider({
 	storageKey = "hcs-theme",
 	...props
 }: ThemeProviderProps) {
-	const [theme, setTheme] = useState<Theme>(defaultTheme);
+	const [theme, setTheme] = useState<Theme>(() => {
+		// Only access localStorage on client-side
+		if (typeof window !== "undefined") {
+			try {
+				const savedTheme = localStorage.getItem(storageKey) as Theme;
+				if (
+					savedTheme &&
+					(savedTheme === "light" ||
+						savedTheme === "dark" ||
+						savedTheme === "system")
+				) {
+					return savedTheme;
+				}
+			} catch (error) {
+				console.warn("Failed to load theme from localStorage:", error);
+			}
+		}
+		return defaultTheme;
+	});
+
 	const [systemTheme, setSystemTheme] = useState<
 		"light" | "dark" | undefined
 	>();
@@ -44,20 +63,8 @@ export function ThemeProvider({
 	// Initialize theme from localStorage on mount
 	useEffect(() => {
 		setMounted(true);
-		try {
-			const savedTheme = localStorage.getItem(storageKey) as Theme;
-			if (
-				savedTheme &&
-				(savedTheme === "light" ||
-					savedTheme === "dark" ||
-					savedTheme === "system")
-			) {
-				setTheme(savedTheme);
-			}
-		} catch (error) {
-			console.warn("Failed to load theme from localStorage:", error);
-		}
-	}, [storageKey]);
+		// No need to check localStorage again since we already did it in useState
+	}, []);
 
 	// Apply theme to DOM
 	useEffect(() => {

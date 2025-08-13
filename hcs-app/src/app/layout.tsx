@@ -111,19 +111,6 @@ export default function RootLayout({
 					href="https://fonts.gstatic.com"
 					crossOrigin="anonymous"
 				/>
-				<script
-					dangerouslySetInnerHTML={{
-						__html: `
-							(function() {
-								try {
-									var theme = localStorage.getItem('hcs-theme') || 'system';
-									var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-									document.documentElement.classList.add(isDark ? 'dark' : 'light');
-								} catch (e) {}
-							})();
-						`,
-					}}
-				/>
 			</head>
 			<body className="min-h-screen bg-background font-sans antialiased">
 				<ThemeProvider defaultTheme="system" storageKey="hcs-theme">
