@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { MessageCircle, Send, Heart, Reply, Flag, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,67 +36,68 @@ export function BlogComments({ postId }: BlogCommentsProps) {
 	});
 
 	// Mock comments data
-	const mockComments: Comment[] = [
-		{
-			id: "1",
-			author: "Sarah Johnson",
-			role: "parent",
-			content:
-				"This is such an insightful article! As a parent, I really appreciate the practical tips shared here. My daughter has been struggling with online learning, and these strategies will definitely help.",
-			date: "2024-01-15T10:30:00Z",
-			likes: 12,
-			isLiked: false,
-			replies: [
-				{
-					id: "1-1",
-					author: "Dr. Emily Chen",
-					role: "teacher",
-					content:
-						"Thank you for your feedback, Sarah! I'm glad you found the article helpful. Feel free to reach out if you need any specific guidance for your daughter.",
-					date: "2024-01-15T14:20:00Z",
-					likes: 8,
-					isLiked: true,
-					replies: [],
-				},
-			],
-		},
-		{
-			id: "2",
-			author: "Michael Rodriguez",
-			role: "student",
-			content:
-				"Great article! I especially liked the part about time management. I've been using some of these techniques and they really work. Thanks for sharing!",
-			date: "2024-01-14T16:45:00Z",
-			likes: 7,
-			isLiked: false,
-			replies: [],
-		},
-		{
-			id: "3",
-			author: "Jennifer Smith",
-			role: "parent",
-			content:
-				"I wish we had access to these resources when I was in school. The digital learning tools mentioned here are amazing. Looking forward to more articles like this!",
-			date: "2024-01-14T09:15:00Z",
-			likes: 15,
-			isLiked: true,
-			replies: [
-				{
-					id: "3-1",
-					author: "Admin Team",
-					role: "admin",
-					content:
-						"We're constantly working to improve our digital learning platform. Stay tuned for more updates and resources!",
-					date: "2024-01-14T11:30:00Z",
-					likes: 5,
-					isLiked: false,
-					replies: [],
-				},
-			],
-		},
-	];
-
-	// Simulate loading
+	const mockComments: Comment[] = useMemo(
+		() => [
+			{
+				id: "1",
+				author: "Sarah Johnson",
+				role: "parent",
+				content:
+					"This is such an insightful article! As a parent, I really appreciate the practical tips shared here. My daughter has been struggling with online learning, and these strategies will definitely help.",
+				date: "2024-01-15T10:30:00Z",
+				likes: 12,
+				isLiked: false,
+				replies: [
+					{
+						id: "1-1",
+						author: "Dr. Emily Chen",
+						role: "teacher",
+						content:
+							"Thank you for your feedback, Sarah! I'm glad you found the article helpful. Feel free to reach out if you need any specific guidance for your daughter.",
+						date: "2024-01-15T14:20:00Z",
+						likes: 8,
+						isLiked: true,
+						replies: [],
+					},
+				],
+			},
+			{
+				id: "2",
+				author: "Michael Rodriguez",
+				role: "student",
+				content:
+					"Great article! I especially liked the part about time management. I've been using some of these techniques and they really work. Thanks for sharing!",
+				date: "2024-01-14T16:45:00Z",
+				likes: 7,
+				isLiked: false,
+				replies: [],
+			},
+			{
+				id: "3",
+				author: "Jennifer Smith",
+				role: "parent",
+				content:
+					"I wish we had access to these resources when I was in school. The digital learning tools mentioned here are amazing. Looking forward to more articles like this!",
+				date: "2024-01-14T09:15:00Z",
+				likes: 15,
+				isLiked: true,
+				replies: [
+					{
+						id: "3-1",
+						author: "Admin Team",
+						role: "admin",
+						content:
+							"We're constantly working to improve our digital learning platform. Stay tuned for more updates and resources!",
+						date: "2024-01-14T11:30:00Z",
+						likes: 5,
+						isLiked: false,
+						replies: [],
+					},
+				],
+			},
+		],
+		[]
+	); // Simulate loading
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setComments(mockComments);
@@ -104,7 +105,7 @@ export function BlogComments({ postId }: BlogCommentsProps) {
 		}, 1000);
 
 		return () => clearTimeout(timer);
-	}, [postId]);
+	}, [postId, mockComments]);
 
 	const handleSubmitComment = (e: React.FormEvent) => {
 		e.preventDefault();

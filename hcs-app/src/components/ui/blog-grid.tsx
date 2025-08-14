@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
 	Calendar,
 	User,
@@ -48,106 +48,107 @@ export function BlogGrid({ selectedCategory }: BlogGridProps) {
 	const postsPerPage = 6;
 
 	// Mock blog posts data
-	const mockBlogPosts: BlogPost[] = [
-		{
-			id: "1",
-			title: "The Future of Digital Learning in Primary Education",
-			excerpt:
-				"Exploring how technology is reshaping the way young students learn and interact with educational content in the modern classroom.",
-			author: "Dr. Jennifer Smith",
-			date: "2024-01-15",
-			readTime: "6 min read",
-			category: "Education",
-			image: "/api/placeholder/400/250",
-			views: 1420,
-			likes: 89,
-			comments: 23,
-			featured: false,
-			tags: ["Technology", "Primary Education", "Digital Learning"],
-		},
-		{
-			id: "2",
-			title: "Student Mental Health: Building Resilience in Schools",
-			excerpt:
-				"A comprehensive guide to supporting student wellbeing and creating a positive learning environment for all students.",
-			author: "Ms. Sarah Johnson",
-			date: "2024-01-12",
-			readTime: "8 min read",
-			category: "Student Life",
-			image: "/api/placeholder/400/250",
-			views: 980,
-			likes: 156,
-			comments: 45,
-			featured: true,
-			tags: ["Mental Health", "Wellbeing", "Support"],
-		},
-		{
-			id: "3",
-			title: "Celebrating Our Science Fair Winners",
-			excerpt:
-				"Highlighting the innovative projects and creative minds that made this year's science fair a tremendous success.",
-			author: "Mr. David Chen",
-			date: "2024-01-10",
-			readTime: "4 min read",
-			category: "Achievements",
-			image: "/api/placeholder/400/250",
-			views: 750,
-			likes: 67,
-			comments: 12,
-			featured: false,
-			tags: ["Science", "Innovation", "Students"],
-		},
-		{
-			id: "4",
-			title: "Parent-Teacher Collaboration: Keys to Success",
-			excerpt:
-				"Strategies for building strong partnerships between families and educators to support student achievement.",
-			author: "Ms. Emily Rodriguez",
-			date: "2024-01-08",
-			readTime: "5 min read",
-			category: "Community",
-			image: "/api/placeholder/400/250",
-			views: 920,
-			likes: 134,
-			comments: 38,
-			featured: false,
-			tags: ["Parents", "Teachers", "Collaboration"],
-		},
-		{
-			id: "5",
-			title: "Innovative Art Projects Transform Our Hallways",
-			excerpt:
-				"See how our students' creativity has brought color and life to every corner of our school campus.",
-			author: "Ms. Lisa Kim",
-			date: "2024-01-05",
-			readTime: "3 min read",
-			category: "Student Life",
-			image: "/api/placeholder/400/250",
-			views: 680,
-			likes: 95,
-			comments: 18,
-			featured: false,
-			tags: ["Art", "Creativity", "Campus"],
-		},
-		{
-			id: "6",
-			title: "New Playground Equipment Installation Complete",
-			excerpt:
-				"Our new state-of-the-art playground equipment is now ready for students to enjoy during recess and after school.",
-			author: "Mr. Robert Wilson",
-			date: "2024-01-03",
-			readTime: "2 min read",
-			category: "Announcements",
-			image: "/api/placeholder/400/250",
-			views: 540,
-			likes: 78,
-			comments: 9,
-			featured: false,
-			tags: ["Playground", "Facilities", "Safety"],
-		},
-	];
-
-	// Simulate loading
+	const mockBlogPosts: BlogPost[] = useMemo(
+		() => [
+			{
+				id: "1",
+				title: "The Future of Digital Learning in Primary Education",
+				excerpt:
+					"Exploring how technology is reshaping the way young students learn and interact with educational content in the modern classroom.",
+				author: "Dr. Jennifer Smith",
+				date: "2024-01-15",
+				readTime: "6 min read",
+				category: "Education",
+				image: "/api/placeholder/400/250",
+				views: 1420,
+				likes: 89,
+				comments: 23,
+				featured: false,
+				tags: ["Technology", "Primary Education", "Digital Learning"],
+			},
+			{
+				id: "2",
+				title: "Student Mental Health: Building Resilience in Schools",
+				excerpt:
+					"A comprehensive guide to supporting student wellbeing and creating a positive learning environment for all students.",
+				author: "Ms. Sarah Johnson",
+				date: "2024-01-12",
+				readTime: "8 min read",
+				category: "Student Life",
+				image: "/api/placeholder/400/250",
+				views: 980,
+				likes: 156,
+				comments: 45,
+				featured: true,
+				tags: ["Mental Health", "Wellbeing", "Support"],
+			},
+			{
+				id: "3",
+				title: "Celebrating Our Science Fair Winners",
+				excerpt:
+					"Highlighting the innovative projects and creative minds that made this year's science fair a tremendous success.",
+				author: "Mr. David Chen",
+				date: "2024-01-10",
+				readTime: "4 min read",
+				category: "Achievements",
+				image: "/api/placeholder/400/250",
+				views: 750,
+				likes: 67,
+				comments: 12,
+				featured: false,
+				tags: ["Science", "Innovation", "Students"],
+			},
+			{
+				id: "4",
+				title: "Parent-Teacher Collaboration: Keys to Success",
+				excerpt:
+					"Strategies for building strong partnerships between families and educators to support student achievement.",
+				author: "Ms. Emily Rodriguez",
+				date: "2024-01-08",
+				readTime: "5 min read",
+				category: "Community",
+				image: "/api/placeholder/400/250",
+				views: 920,
+				likes: 134,
+				comments: 38,
+				featured: false,
+				tags: ["Parents", "Teachers", "Collaboration"],
+			},
+			{
+				id: "5",
+				title: "Innovative Art Projects Transform Our Hallways",
+				excerpt:
+					"See how our students' creativity has brought color and life to every corner of our school campus.",
+				author: "Ms. Lisa Kim",
+				date: "2024-01-05",
+				readTime: "3 min read",
+				category: "Student Life",
+				image: "/api/placeholder/400/250",
+				views: 680,
+				likes: 95,
+				comments: 18,
+				featured: false,
+				tags: ["Art", "Creativity", "Campus"],
+			},
+			{
+				id: "6",
+				title: "New Playground Equipment Installation Complete",
+				excerpt:
+					"Our new state-of-the-art playground equipment is now ready for students to enjoy during recess and after school.",
+				author: "Mr. Robert Wilson",
+				date: "2024-01-03",
+				readTime: "2 min read",
+				category: "Announcements",
+				image: "/api/placeholder/400/250",
+				views: 540,
+				likes: 78,
+				comments: 9,
+				featured: false,
+				tags: ["Playground", "Facilities", "Safety"],
+			},
+		],
+		[]
+	); // Simulate loading
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setBlogPosts(mockBlogPosts);
@@ -155,7 +156,7 @@ export function BlogGrid({ selectedCategory }: BlogGridProps) {
 		}, 1000);
 
 		return () => clearTimeout(timer);
-	}, []);
+	}, [mockBlogPosts]);
 
 	// Filter and search posts
 	useEffect(() => {
@@ -459,8 +460,8 @@ export function BlogGrid({ selectedCategory }: BlogGridProps) {
 							No articles found
 						</h3>
 						<p className="text-muted-foreground mb-4">
-							Try adjusting your search or filters to find what you're looking
-							for.
+							Try adjusting your search or filters to find what you&apos;re
+							looking for.
 						</p>
 						<Button
 							variant="outline"

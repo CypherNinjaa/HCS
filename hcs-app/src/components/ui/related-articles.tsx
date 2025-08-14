@@ -23,7 +23,7 @@ interface RelatedArticlesProps {
 	postId: string;
 }
 
-export function RelatedArticles({ postId }: RelatedArticlesProps) {
+export function RelatedArticles({}: RelatedArticlesProps) {
 	// Mock related articles data
 	const relatedArticles: RelatedArticle[] = [
 		{
