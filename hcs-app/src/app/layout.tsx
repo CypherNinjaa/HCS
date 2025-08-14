@@ -112,10 +112,10 @@ export default function RootLayout({
 					crossOrigin="anonymous"
 				/>
 			</head>
-			<body className="min-h-screen bg-background font-sans antialiased">
+			<body className="min-h-screen bg-background font-sans antialiased overflow-x-hidden">
 				<ThemeProvider defaultTheme="system" storageKey="hcs-theme">
-					<div className="relative flex min-h-screen flex-col">
-						<main className="flex-1">{children}</main>
+					<div className="relative flex min-h-screen flex-col w-full">
+						<main className="flex-1 w-full">{children}</main>
 					</div>
 				</ThemeProvider>
 			</body>
