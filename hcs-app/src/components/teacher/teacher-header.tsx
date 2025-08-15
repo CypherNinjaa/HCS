@@ -213,7 +213,7 @@ export function TeacherHeader({
 							className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
 						>
 							<Image
-								src={teacherData.profilePicture || "/api/placeholder/150/150"}
+								src={teacherData.profilePicture || "/default-profile.svg"}
 								alt={teacherData.name}
 								width={32}
 								height={32}
@@ -242,9 +242,7 @@ export function TeacherHeader({
 								<div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
 									<div className="flex items-center space-x-3">
 										<Image
-											src={
-												teacherData.profilePicture || "/api/placeholder/150/150"
-											}
+											src={teacherData.profilePicture || "/default-profile.svg"}
 											alt={teacherData.name}
 											width={40}
 											height={40}

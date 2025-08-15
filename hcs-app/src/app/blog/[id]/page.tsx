@@ -5,25 +5,26 @@ import { BlogComments } from "@/components/ui/blog-comments";
 import { RelatedArticles } from "@/components/ui/related-articles";
 
 interface BlogPostPageProps {
-	params: {
+	params: Promise<{
 		id: string;
-	};
+	}>;
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+	const { id } = await params;
+
 	return (
 		<main className="min-h-screen bg-background">
 			<ModernHeader />
-
-			{/* Main Blog Post Content */}
-			<BlogPostContent postId={params.id} />
-
-			{/* Comments Section */}
-			<BlogComments postId={params.id} />
-
-			{/* Related Articles */}
-			<RelatedArticles postId={params.id} />
-
+			<div className="container mx-auto px-4 py-8">
+				<BlogPostContent postId={id} />
+			</div>
+			<div className="border-t">
+				<BlogComments postId={id} />
+			</div>
+			<div className="border-t bg-muted/50">
+				<RelatedArticles postId={id} />
+			</div>
 			<ModernFooter />
 		</main>
 	);

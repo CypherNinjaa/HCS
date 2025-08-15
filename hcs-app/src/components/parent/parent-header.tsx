@@ -100,8 +100,7 @@ export function ParentHeader({
 						<div className="flex items-center space-x-2">
 							<Image
 								src={
-									selectedChildData?.profilePicture ||
-									"/api/placeholder/100/100"
+									selectedChildData?.profilePicture || "/default-profile.svg"
 								}
 								alt={selectedChildData?.name || "Child"}
 								width={24}
@@ -147,7 +146,7 @@ export function ParentHeader({
 									}`}
 								>
 									<Image
-										src={child.profilePicture || "/api/placeholder/100/100"}
+										src={child.profilePicture || "/default-profile.svg"}
 										alt={child.name}
 										width={32}
 										height={32}
@@ -209,7 +208,7 @@ export function ParentHeader({
 						className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
 					>
 						<Image
-							src={parentData.profilePicture || "/api/placeholder/150/150"}
+							src={parentData.profilePicture || "/default-profile.svg"}
 							alt={parentData.name}
 							width={32}
 							height={32}
