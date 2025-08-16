@@ -132,27 +132,6 @@ export function AdminHeader({
 					{/* Theme Toggle */}
 					<ThemeToggle />
 
-					{/* Theme Force Refresh - Debug */}
-					<button
-						onClick={() => {
-							if (typeof window !== "undefined") {
-								// Force refresh theme classes
-								const root = document.documentElement;
-								const currentTheme = root.classList.contains("dark")
-									? "dark"
-									: "light";
-								root.classList.remove("light", "dark");
-								setTimeout(() => {
-									root.classList.add(currentTheme);
-								}, 10);
-							}
-						}}
-						className="p-2 rounded-lg hover:bg-muted transition-colors text-xs border border-red-300 dark:border-red-600"
-						title="Force Theme Refresh"
-					>
-						🔄
-					</button>
-
 					{/* Admin Profile */}
 					<div className="flex items-center gap-3 ml-2">
 						<div className="hidden sm:block text-right">

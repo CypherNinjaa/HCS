@@ -213,7 +213,7 @@ export function LiveAnalytics() {
 								transition={{ delay: 0.5 + index * 0.1, duration: 0.6 }}
 								className="flex-1 bg-gradient-to-t from-blue-500 to-cyan-400 rounded-t-lg relative group cursor-pointer"
 							>
-								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground border border-border text-xs px-2 py-1 rounded whitespace-nowrap">
+								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
 									{data.students} students
 								</div>
 								<div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-muted-foreground">
@@ -249,7 +249,7 @@ export function LiveAnalytics() {
 								transition={{ delay: 0.6 + index * 0.1, duration: 0.6 }}
 								className="flex-1 bg-gradient-to-t from-green-500 to-emerald-400 rounded-t-lg relative group cursor-pointer"
 							>
-								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground border border-border text-xs px-2 py-1 rounded whitespace-nowrap">
+								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
 									₹{(data.fees / 100000).toFixed(1)}L
 								</div>
 								<div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-muted-foreground">
