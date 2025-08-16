@@ -16,149 +16,159 @@ import {
 	Mail,
 	Phone,
 	AlertCircle,
+	Loader2,
+	RefreshCw,
 } from "lucide-react";
-import { useState } from "react";
-
-interface Student {
-	id: string;
-	name: string;
-	studentId: string;
-	class: string;
-	section: string;
-	rollNumber: string;
-	email: string;
-	phone: string;
-	address: string;
-	dateOfBirth: string;
-	admissionDate: string;
-	feeStatus: "paid" | "pending" | "overdue";
-	attendance: number;
-	performance: "excellent" | "good" | "average" | "needs_improvement";
-	parentName: string;
-	parentPhone: string;
-	status: "active" | "inactive" | "suspended";
-}
+import { useState, useEffect, useCallback } from "react";
+import { Student, StudentSearchParams, Class } from "@/types/student";
+import {
+	studentService,
+	formatStudentName,
+	getStatusColor,
+	getFeeStatusColor,
+	getPerformanceColor,
+} from "@/services/student.service";
+import { StudentFormModal } from "@/components/admin/student-form-modal";
+import { handleApiError } from "@/lib/api-client";
+import { useAuth } from "@/context/auth-context";
 
 export function StudentManagement() {
+	const { isAuthenticated, user } = useAuth();
+	const [students, setStudents] = useState<Student[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedClass, setSelectedClass] = useState("all");
 	const [selectedStatus, setSelectedStatus] = useState("all");
 	const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
-
-	const [students] = useState<Student[]>([
-		{
-			id: "1",
-			name: "Arjun Sharma",
-			studentId: "STU2025001",
-			class: "10",
-			section: "A",
-			rollNumber: "001",
-			email: "arjun.sharma@student.hcs.edu",
-			phone: "+91 98765 43210",
-			address: "123 Main Street, City",
-			dateOfBirth: "2009-05-15",
-			admissionDate: "2020-04-01",
-			feeStatus: "paid",
-			attendance: 95,
-			performance: "excellent",
-			parentName: "Rajesh Sharma",
-			parentPhone: "+91 98765 43211",
-			status: "active",
-		},
-		{
-			id: "2",
-			name: "Priya Patel",
-			studentId: "STU2025002",
-			class: "9",
-			section: "B",
-			rollNumber: "015",
-			email: "priya.patel@student.hcs.edu",
-			phone: "+91 98765 43220",
-			address: "456 Garden Road, City",
-			dateOfBirth: "2010-08-22",
-			admissionDate: "2021-04-01",
-			feeStatus: "pending",
-			attendance: 92,
-			performance: "good",
-			parentName: "Suresh Patel",
-			parentPhone: "+91 98765 43221",
-			status: "active",
-		},
-		{
-			id: "3",
-			name: "Rahul Kumar",
-			studentId: "STU2025003",
-			class: "10",
-			section: "B",
-			rollNumber: "008",
-			email: "rahul.kumar@student.hcs.edu",
-			phone: "+91 98765 43230",
-			address: "789 Park Avenue, City",
-			dateOfBirth: "2009-12-10",
-			admissionDate: "2020-04-01",
-			feeStatus: "overdue",
-			attendance: 88,
-			performance: "average",
-			parentName: "Vikash Kumar",
-			parentPhone: "+91 98765 43231",
-			status: "active",
-		},
-		// Add more sample students...
-	]);
-
-	const filteredStudents = students.filter((student) => {
-		const matchesSearch =
-			student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			student.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-		const matchesClass =
-			selectedClass === "all" || student.class === selectedClass;
-		const matchesStatus =
-			selectedStatus === "all" || student.status === selectedStatus;
-
-		return matchesSearch && matchesClass && matchesStatus;
+	const [classes, setClasses] = useState<Class[]>([]);
+	const [stats, setStats] = useState({
+		total: 0,
+		active: 0,
+		newAdmissions: 0,
+		pendingFees: 0,
+	});
+	const [pagination, setPagination] = useState({
+		page: 1,
+		limit: 10,
+		total: 0,
+		totalPages: 0,
 	});
 
-	const getStatusColor = (status: string) => {
-		switch (status) {
-			case "active":
-				return "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-			case "inactive":
-				return "bg-muted text-muted-foreground";
-			case "suspended":
-				return "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-			default:
-				return "bg-muted text-muted-foreground";
+	// Modal states
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [modalMode, setModalMode] = useState<"create" | "edit">("create");
+	const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
+	const loadStudents = useCallback(async () => {
+		try {
+			setLoading(true);
+			setError(null);
+
+			const params: StudentSearchParams = {
+				page: pagination.page,
+				limit: pagination.limit,
+			};
+
+			if (searchTerm.trim()) {
+				params.search = searchTerm.trim();
+			}
+
+			if (selectedClass !== "all") {
+				params.grade = parseInt(selectedClass);
+			}
+
+			if (selectedStatus !== "all") {
+				params.isActive = selectedStatus === "active";
+			}
+
+			const response = await studentService.getStudents(params);
+
+			if (response.success) {
+				setStudents(response.data);
+				setPagination(response.pagination);
+			}
+		} catch (error) {
+			setError(handleApiError(error));
+		} finally {
+			setLoading(false);
+		}
+	}, [
+		searchTerm,
+		selectedClass,
+		selectedStatus,
+		pagination.page,
+		pagination.limit,
+	]);
+
+	const loadClasses = useCallback(async () => {
+		try {
+			const response = await studentService.getClasses();
+			if (response.success) {
+				setClasses(response.data);
+			}
+		} catch (error) {
+			console.error("Failed to load classes:", error);
+		}
+	}, []);
+
+	const loadStats = useCallback(async () => {
+		try {
+			const response = await studentService.getDashboardStats();
+			if (response.success) {
+				setStats(response.data);
+			}
+		} catch (error) {
+			console.error("Failed to load stats:", error);
+		}
+	}, []);
+
+	// Load data on component mount
+	useEffect(() => {
+		loadClasses();
+		loadStats();
+	}, [loadClasses, loadStats]);
+
+	// Reload students when search/filter changes
+	useEffect(() => {
+		const delayedSearch = setTimeout(() => {
+			loadStudents();
+		}, 300); // Debounce search
+
+		return () => clearTimeout(delayedSearch);
+	}, [loadStudents]);
+
+	const handleCreateStudent = () => {
+		setModalMode("create");
+		setSelectedStudent(null);
+		setIsModalOpen(true);
+	};
+
+	const handleEditStudent = (student: Student) => {
+		setModalMode("edit");
+		setSelectedStudent(student);
+		setIsModalOpen(true);
+	};
+
+	const handleDeleteStudent = async (student: Student) => {
+		if (
+			window.confirm(
+				`Are you sure you want to delete ${formatStudentName(student)}?`
+			)
+		) {
+			try {
+				await studentService.deleteStudent(student.id);
+				loadStudents();
+				loadStats();
+			} catch (error) {
+				alert(handleApiError(error));
+			}
 		}
 	};
 
-	const getFeeStatusColor = (status: string) => {
-		switch (status) {
-			case "paid":
-				return "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-			case "pending":
-				return "bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
-			case "overdue":
-				return "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-			default:
-				return "bg-muted text-muted-foreground";
-		}
-	};
-
-	const getPerformanceColor = (performance: string) => {
-		switch (performance) {
-			case "excellent":
-				return "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-			case "good":
-				return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
-			case "average":
-				return "bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
-			case "needs_improvement":
-				return "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-			default:
-				return "bg-muted text-muted-foreground";
-		}
+	const handleModalSuccess = () => {
+		loadStudents();
+		loadStats();
 	};
 
 	const toggleStudentSelection = (studentId: string) => {
@@ -170,12 +180,44 @@ export function StudentManagement() {
 	};
 
 	const selectAllStudents = () => {
-		if (selectedStudents.length === filteredStudents.length) {
+		if (selectedStudents.length === students.length) {
 			setSelectedStudents([]);
 		} else {
-			setSelectedStudents(filteredStudents.map((s) => s.id));
+			setSelectedStudents(students.map((s) => s.id));
 		}
 	};
+
+	const handleBulkAction = async (action: "activate" | "deactivate") => {
+		if (selectedStudents.length === 0) return;
+
+		try {
+			await studentService.bulkUpdateStudents(selectedStudents, action);
+			setSelectedStudents([]);
+			loadStudents();
+			loadStats();
+		} catch (error) {
+			alert(handleApiError(error));
+		}
+	};
+
+	const handlePageChange = (newPage: number) => {
+		setPagination((prev) => ({ ...prev, page: newPage }));
+	};
+
+	// Check authentication before rendering
+	if (!isAuthenticated || !user) {
+		return (
+			<div className="flex flex-col items-center justify-center p-8 text-center">
+				<AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+				<h3 className="text-lg font-semibold text-foreground mb-2">
+					Authentication Required
+				</h3>
+				<p className="text-muted-foreground">
+					Please log in to access the student management system.
+				</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className="space-y-6">
@@ -190,7 +232,10 @@ export function StudentManagement() {
 					</p>
 				</div>
 				<div className="flex flex-wrap items-center gap-3">
-					<button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200">
+					<button
+						onClick={handleCreateStudent}
+						className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+					>
 						<Plus className="h-4 w-4" />
 						Add Student
 					</button>
@@ -202,6 +247,13 @@ export function StudentManagement() {
 						<Download className="h-4 w-4" />
 						Export
 					</button>
+					<button
+						onClick={loadStudents}
+						className="flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
+					>
+						<RefreshCw className="h-4 w-4" />
+						Refresh
+					</button>
 				</div>
 			</div>
 
@@ -210,25 +262,25 @@ export function StudentManagement() {
 				{[
 					{
 						title: "Total Students",
-						value: "1,847",
+						value: stats.total.toString(),
 						icon: Users,
 						color: "from-blue-500 to-cyan-500",
 					},
 					{
 						title: "Active Students",
-						value: "1,823",
+						value: stats.active.toString(),
 						icon: UserPlus,
 						color: "from-green-500 to-emerald-500",
 					},
 					{
 						title: "New Admissions",
-						value: "23",
+						value: stats.newAdmissions.toString(),
 						icon: GraduationCap,
 						color: "from-purple-500 to-pink-500",
 					},
 					{
 						title: "Pending Fees",
-						value: "156",
+						value: stats.pendingFees.toString(),
 						icon: AlertCircle,
 						color: "from-orange-500 to-red-500",
 					},
@@ -260,6 +312,13 @@ export function StudentManagement() {
 				})}
 			</div>
 
+			{/* Error Display */}
+			{error && (
+				<div className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+					<p className="text-red-700 dark:text-red-300">{error}</p>
+				</div>
+			)}
+
 			{/* Filters and Search */}
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
@@ -288,16 +347,13 @@ export function StudentManagement() {
 							className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:outline-none"
 						>
 							<option value="all">All Classes</option>
-							<option value="1">Class 1</option>
-							<option value="2">Class 2</option>
-							<option value="3">Class 3</option>
-							<option value="4">Class 4</option>
-							<option value="5">Class 5</option>
-							<option value="6">Class 6</option>
-							<option value="7">Class 7</option>
-							<option value="8">Class 8</option>
-							<option value="9">Class 9</option>
-							<option value="10">Class 10</option>
+							{Array.from(new Set(classes.map((cls) => cls.grade)))
+								.sort()
+								.map((grade) => (
+									<option key={grade} value={grade.toString()}>
+										Class {grade}
+									</option>
+								))}
 						</select>
 
 						<select
@@ -308,7 +364,6 @@ export function StudentManagement() {
 							<option value="all">All Status</option>
 							<option value="active">Active</option>
 							<option value="inactive">Inactive</option>
-							<option value="suspended">Suspended</option>
 						</select>
 
 						<button className="flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors">
@@ -322,18 +377,21 @@ export function StudentManagement() {
 				{selectedStudents.length > 0 && (
 					<div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
 						<div className="flex items-center justify-between">
-							<span className="text-sm font-medium text-blue-900">
+							<span className="text-sm font-medium text-blue-900 dark:text-blue-100">
 								{selectedStudents.length} student(s) selected
 							</span>
 							<div className="flex gap-2">
-								<button className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-									Send Message
+								<button
+									onClick={() => handleBulkAction("activate")}
+									className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+								>
+									Activate
 								</button>
-								<button className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
-									Update Status
-								</button>
-								<button className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
-									Remove
+								<button
+									onClick={() => handleBulkAction("deactivate")}
+									className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+								>
+									Deactivate
 								</button>
 							</div>
 						</div>
@@ -348,185 +406,273 @@ export function StudentManagement() {
 				transition={{ delay: 0.4 }}
 				className="bg-card rounded-xl border border-border overflow-hidden"
 			>
-				<div className="overflow-x-auto">
-					<table className="w-full bg-card">
-						<thead className="bg-muted">
-							<tr>
-								<th className="px-6 py-4 text-left">
-									<input
-										type="checkbox"
-										checked={
-											selectedStudents.length === filteredStudents.length &&
-											filteredStudents.length > 0
-										}
-										onChange={selectAllStudents}
-										className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-									/>
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Student
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Class & Section
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Contact
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Attendance
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Performance
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Fee Status
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Status
-								</th>
-								<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Actions
-								</th>
-							</tr>
-						</thead>
-						<tbody className="divide-y divide-border bg-card">
-							{filteredStudents.map((student, index) => (
-								<motion.tr
-									key={student.id}
-									initial={{ opacity: 0, y: 10 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{ delay: 0.5 + index * 0.05 }}
-									className="hover:bg-muted transition-colors bg-card"
-								>
-									<td className="px-6 py-4 bg-card">
-										<input
-											type="checkbox"
-											checked={selectedStudents.includes(student.id)}
-											onChange={() => toggleStudentSelection(student.id)}
-											className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-										/>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<div className="flex items-center gap-3">
-											<div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-												{student.name.charAt(0)}
-											</div>
-											<div>
-												<p className="font-medium text-foreground">
-													{student.name}
-												</p>
-												<p className="text-sm text-muted-foreground">
-													{student.studentId}
-												</p>
-											</div>
-										</div>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<div>
-											<p className="font-medium text-foreground">
-												Class {student.class}-{student.section}
-											</p>
-											<p className="text-sm text-muted-foreground">
-												Roll: {student.rollNumber}
-											</p>
-										</div>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<div className="space-y-1">
-											<div className="flex items-center gap-1 text-sm text-muted-foreground">
-												<Mail className="h-3 w-3" />
-												<span className="truncate max-w-32">
-													{student.email}
-												</span>
-											</div>
-											<div className="flex items-center gap-1 text-sm text-muted-foreground">
-												<Phone className="h-3 w-3" />
-												<span>{student.phone}</span>
-											</div>
-										</div>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<div className="flex items-center gap-2">
-											<div className="w-16 bg-muted rounded-full h-2">
-												<div
-													className="bg-blue-600 h-2 rounded-full"
-													style={{ width: `${student.attendance}%` }}
-												/>
-											</div>
-											<span className="text-sm font-medium text-foreground">
-												{student.attendance}%
-											</span>
-										</div>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<span
-											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPerformanceColor(
-												student.performance
-											)}`}
-										>
-											{student.performance.replace("_", " ")}
-										</span>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<span
-											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getFeeStatusColor(
-												student.feeStatus
-											)}`}
-										>
-											{student.feeStatus}
-										</span>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<span
-											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-												student.status
-											)}`}
-										>
-											{student.status}
-										</span>
-									</td>
-									<td className="px-6 py-4 bg-card">
-										<div className="flex items-center gap-2">
-											<button className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors">
-												<Eye className="h-4 w-4" />
-											</button>
-											<button className="p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 rounded transition-colors">
-												<Edit className="h-4 w-4" />
-											</button>
-											<button className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors">
-												<Trash2 className="h-4 w-4" />
-											</button>
-										</div>
-									</td>
-								</motion.tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-
-				{/* Pagination */}
-				<div className="px-6 py-4 border-t border-border">
-					<div className="flex items-center justify-between">
-						<div className="text-sm text-muted-foreground">
-							Showing {filteredStudents.length} of {students.length} students
-						</div>
-						<div className="flex items-center gap-2">
-							<button className="px-3 py-1 text-sm border border-border rounded hover:bg-muted transition-colors">
-								Previous
-							</button>
-							<button className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-								1
-							</button>
-							<button className="px-3 py-1 text-sm border border-border rounded hover:bg-muted transition-colors">
-								2
-							</button>
-							<button className="px-3 py-1 text-sm border border-border rounded hover:bg-muted transition-colors">
-								Next
-							</button>
-						</div>
+				{loading ? (
+					<div className="flex items-center justify-center p-8">
+						<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+						<span className="ml-2 text-muted-foreground">
+							Loading students...
+						</span>
 					</div>
-				</div>
+				) : students.length === 0 ? (
+					<div className="flex flex-col items-center justify-center p-8 text-center">
+						<Users className="h-12 w-12 text-muted-foreground mb-4" />
+						<h3 className="text-lg font-semibold text-foreground mb-2">
+							No students found
+						</h3>
+						<p className="text-muted-foreground mb-4">
+							{searchTerm || selectedClass !== "all" || selectedStatus !== "all"
+								? "Try adjusting your filters or search terms."
+								: "Get started by adding your first student."}
+						</p>
+						{!searchTerm &&
+							selectedClass === "all" &&
+							selectedStatus === "all" && (
+								<button
+									onClick={handleCreateStudent}
+									className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+								>
+									<Plus className="h-4 w-4" />
+									Add First Student
+								</button>
+							)}
+					</div>
+				) : (
+					<>
+						<div className="overflow-x-auto">
+							<table className="w-full bg-card">
+								<thead className="bg-muted">
+									<tr>
+										<th className="px-6 py-4 text-left">
+											<input
+												type="checkbox"
+												checked={
+													selectedStudents.length === students.length &&
+													students.length > 0
+												}
+												onChange={selectAllStudents}
+												className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+											/>
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Student
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Class & Section
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Contact
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Attendance
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Performance
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Fee Status
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Status
+										</th>
+										<th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Actions
+										</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y divide-border bg-card">
+									{students.map((student, index) => (
+										<motion.tr
+											key={student.id}
+											initial={{ opacity: 0, y: 10 }}
+											animate={{ opacity: 1, y: 0 }}
+											transition={{ delay: 0.5 + index * 0.05 }}
+											className="hover:bg-muted transition-colors bg-card"
+										>
+											<td className="px-6 py-4 bg-card">
+												<input
+													type="checkbox"
+													checked={selectedStudents.includes(student.id)}
+													onChange={() => toggleStudentSelection(student.id)}
+													className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+												/>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<div className="flex items-center gap-3">
+													<div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+														{student.firstName.charAt(0)}
+														{student.lastName.charAt(0)}
+													</div>
+													<div>
+														<p className="font-medium text-foreground">
+															{formatStudentName(student)}
+														</p>
+														<p className="text-sm text-muted-foreground">
+															{student.studentId}
+														</p>
+													</div>
+												</div>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<div>
+													<p className="font-medium text-foreground">
+														{student.className}
+													</p>
+													<p className="text-sm text-muted-foreground">
+														Roll: {student.rollNumber}
+													</p>
+												</div>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<div className="space-y-1">
+													<div className="flex items-center gap-1 text-sm text-muted-foreground">
+														<Mail className="h-3 w-3" />
+														<span className="truncate max-w-32">
+															{student.email}
+														</span>
+													</div>
+													<div className="flex items-center gap-1 text-sm text-muted-foreground">
+														<Phone className="h-3 w-3" />
+														<span>{student.phone}</span>
+													</div>
+												</div>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<div className="flex items-center gap-2">
+													<div className="w-16 bg-muted rounded-full h-2">
+														<div
+															className="bg-blue-600 h-2 rounded-full"
+															style={{
+																width: `${student.attendancePercentage}%`,
+															}}
+														/>
+													</div>
+													<span className="text-sm font-medium text-foreground">
+														{student.attendancePercentage}%
+													</span>
+												</div>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<span
+													className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPerformanceColor(
+														student.performanceGrade
+													)}`}
+												>
+													{student.performanceGrade.replace("_", " ")}
+												</span>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<span
+													className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getFeeStatusColor(
+														student.feeStatus
+													)}`}
+												>
+													{student.feeStatus}
+												</span>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<span
+													className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+														student.isActive
+													)}`}
+												>
+													{student.isActive ? "Active" : "Inactive"}
+												</span>
+											</td>
+											<td className="px-6 py-4 bg-card">
+												<div className="flex items-center gap-2">
+													<button className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors">
+														<Eye className="h-4 w-4" />
+													</button>
+													<button
+														onClick={() => handleEditStudent(student)}
+														className="p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 rounded transition-colors"
+													>
+														<Edit className="h-4 w-4" />
+													</button>
+													<button
+														onClick={() => handleDeleteStudent(student)}
+														className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+													>
+														<Trash2 className="h-4 w-4" />
+													</button>
+												</div>
+											</td>
+										</motion.tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+
+						{/* Pagination */}
+						<div className="px-6 py-4 border-t border-border">
+							<div className="flex items-center justify-between">
+								<div className="text-sm text-muted-foreground">
+									Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+									{Math.min(
+										pagination.page * pagination.limit,
+										pagination.total
+									)}{" "}
+									of {pagination.total} students
+								</div>
+								<div className="flex items-center gap-2">
+									<button
+										onClick={() => handlePageChange(pagination.page - 1)}
+										disabled={pagination.page <= 1}
+										className="px-3 py-1 text-sm border border-border rounded hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									>
+										Previous
+									</button>
+									{Array.from(
+										{ length: pagination.totalPages },
+										(_, i) => i + 1
+									)
+										.filter(
+											(page) =>
+												page === 1 ||
+												page === pagination.totalPages ||
+												Math.abs(page - pagination.page) <= 1
+										)
+										.map((page, index, array) => (
+											<div key={page} className="flex items-center">
+												{index > 0 && array[index - 1] !== page - 1 && (
+													<span className="px-2 text-muted-foreground">
+														...
+													</span>
+												)}
+												<button
+													onClick={() => handlePageChange(page)}
+													className={`px-3 py-1 text-sm rounded transition-colors ${
+														page === pagination.page
+															? "bg-blue-600 text-white"
+															: "border border-border hover:bg-muted"
+													}`}
+												>
+													{page}
+												</button>
+											</div>
+										))}
+									<button
+										onClick={() => handlePageChange(pagination.page + 1)}
+										disabled={pagination.page >= pagination.totalPages}
+										className="px-3 py-1 text-sm border border-border rounded hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									>
+										Next
+									</button>
+								</div>
+							</div>
+						</div>
+					</>
+				)}
 			</motion.div>
+
+			{/* Student Form Modal */}
+			<StudentFormModal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				onSuccess={handleModalSuccess}
+				student={selectedStudent}
+				mode={modalMode}
+			/>
 		</div>
 	);
 }
