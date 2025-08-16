@@ -1,5 +1,24 @@
 # Happy Child School - Backend Development Roadmap
 
+## 🚀 Confidence-Building Strategy for Backend Development
+
+**Don't be scared! This project is absolutely manageable with the right approach.**
+
+### Why This Strategy Works:
+- ✅ **Incremental Development**: Build one small piece at a time
+- ✅ **Immediate Validation**: Test each step before moving forward
+- ✅ **Clear Checkpoints**: Know exactly where you are and what's next
+- ✅ **Rollback Plans**: Safe ways to undo if something goes wrong
+- ✅ **Foundation-First**: Build solid basics before adding complexity
+
+### Your Current Advantages:
+- ✅ **Solid Foundation**: Next.js 14+ with TypeScript already set up
+- ✅ **Libraries Ready**: Auth utilities, Prisma client, and validation schemas exist
+- ✅ **Clear Requirements**: Well-defined features and security requirements
+- ✅ **Migration-Ready**: Prisma ORM allows easy database switching later
+
+---
+
 ## Project Overview
 
 A comprehensive, secure school management system backend built with Next.js 14+ App Router, TypeScript, and MySQL (migrating to Supabase later). This roadmap ensures the highest security standards, robust architecture, and seamless scalability.
@@ -19,36 +38,809 @@ A comprehensive, secure school management system backend built with Next.js 14+ 
 
 ---
 
-## Phase 1: Foundation & Core Infrastructure (Weeks 1-3)
+## Phase 0: Preparation & Quick Wins (Days 1-3)
 
-### 1.1 Database Schema & Migrations (Week 1)
+### 🎯 Goal: Get immediate confidence with working basics
 
-#### Core Models Priority:
+### 0.1 Environment Setup (Day 1 - 2 hours)
 
-1. **Authentication Models**
+#### Step 1: Create Prisma Directory and Basic Schema
+```bash
+# In hcs-app directory
+mkdir prisma
+cd prisma
+```
 
-   ```prisma
-   User (id, email, passwordHash, role, isActive, lastLoginAt, emailVerified)
-   Profile (userId, firstName, lastName, phone, address, dateOfBirth, avatar)
-   Session (id, userId, token, expiresAt, ipAddress, userAgent)
-   ```
+#### Step 2: Create Initial Schema File
+Create `prisma/schema.prisma`:
 
-2. **Academic Hierarchy Models**
+```prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-   ```prisma
-   AcademicYear (id, year, startDate, endDate, isActive)
-   Class (id, name, grade, section, capacity, academicYearId)
-   Subject (id, name, code, classId, credits, description)
-   ```
+generator client {
+  provider = "prisma-client-js"
+}
 
-3. **User Role Models**
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
 
-   ```prisma
-   Student (id, userId, studentId, classId, rollNumber, admissionDate, isActive)
-   Teacher (id, userId, teacherId, subjects[], qualification, experience, joiningDate)
-   Parent (id, userId, parentId, occupation, relationshipType)
-   ParentStudent (parentId, studentId, relationshipType, isPrimary)
-   ```
+// Start with just User model for immediate testing
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  passwordHash String
+  role        UserRole @default(STUDENT)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("users")
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  PARENT
+  ADMIN
+}
+```
+
+#### Step 3: Environment Configuration
+Create `.env.local` (if not exists):
+
+```env
+# Database
+DATABASE_URL="mysql://username:password@localhost:3306/hcs_db"
+
+# JWT Secret (generate a strong secret)
+JWT_SECRET="your-super-secret-jwt-key-here"
+
+# NextAuth
+NEXTAUTH_SECRET="your-nextauth-secret"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+#### ✅ Validation Checkpoint 1:
+```bash
+# Test schema compilation
+npx prisma generate
+```
+**Expected Result**: No errors, Prisma client generated successfully.
+
+### 0.2 Create Your First API Route (Day 1 - 1 hour)
+
+#### Step 1: Create API Directory Structure
+```bash
+# In hcs-app/src/app
+mkdir -p api/v1/test
+```
+
+#### Step 2: Create Test Endpoint
+Create `src/app/api/v1/test/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  try {
+    return NextResponse.json({
+      success: true,
+      message: "🎉 Your backend is working!",
+      timestamp: new Date().toISOString(),
+      version: "v1"
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+```
+
+#### ✅ Validation Checkpoint 2:
+```bash
+# Start development server
+npm run dev
+
+# Test in browser or curl
+curl http://localhost:3000/api/v1/test
+```
+**Expected Result**: JSON response with success message.
+
+### 0.3 Database Connection Test (Day 2 - 2 hours)
+
+#### Step 1: Set Up Local MySQL (Choose one option)
+
+**Option A: Using XAMPP/WAMP (Easiest)**
+1. Install XAMPP
+2. Start MySQL service
+3. Create database `hcs_db` in phpMyAdmin
+
+**Option B: Using Docker (Recommended)**
+```bash
+# Create docker-compose.yml in project root
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hcs_db
+      MYSQL_USER: hcs_user
+      MYSQL_PASSWORD: hcs_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+```
+
+```bash
+# Start database
+docker-compose up -d
+```
+
+#### Step 2: Update DATABASE_URL
+```env
+# For XAMPP
+DATABASE_URL="mysql://root:@localhost:3306/hcs_db"
+
+# For Docker
+DATABASE_URL="mysql://hcs_user:hcs_password@localhost:3306/hcs_db"
+```
+
+#### Step 3: Run Your First Migration
+```bash
+npx prisma migrate dev --name init
+```
+
+#### ✅ Validation Checkpoint 3:
+```bash
+# Check database tables
+npx prisma studio
+```
+**Expected Result**: Prisma Studio opens, shows `users` table with proper structure.
+
+### 0.4 Create Your First Database API (Day 2-3 - 3 hours)
+
+#### Step 1: Create User API Route
+Create `src/app/api/v1/users/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
+import { UserRole } from '@/lib/auth';
+
+export async function GET() {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      }
+    });
+    
+    return NextResponse.json({
+      success: true,
+      data: users,
+      count: users.length
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch users" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email, password, role = UserRole.STUDENT } = body;
+    
+    // Basic validation
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, error: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+    
+    // Hash password
+    const passwordHash = await hashPassword(password);
+    
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        role,
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      }
+    });
+    
+    return NextResponse.json({
+      success: true,
+      data: user,
+      message: "User created successfully"
+    });
+    
+  } catch (error: any) {
+    console.error('Error creating user:', error);
+    
+    // Handle unique constraint violation
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { success: false, error: "Email already exists" },
+        { status: 409 }
+      );
+    }
+    
+    return NextResponse.json(
+      { success: false, error: "Failed to create user" },
+      { status: 500 }
+    );
+  }
+}
+```
+
+#### ✅ Validation Checkpoint 4:
+```bash
+# Test creating a user
+curl -X POST http://localhost:3000/api/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+
+# Test getting users
+curl http://localhost:3000/api/v1/users
+```
+**Expected Result**: User created successfully, appears in GET request.
+
+### 🎉 Phase 0 Success Metrics:
+- ✅ Prisma schema compiles without errors
+- ✅ Database connection works
+- ✅ First API endpoint responds correctly
+- ✅ Can create and retrieve users from database
+- ✅ Development environment is stable
+
+**Congratulations! You now have a working backend foundation. The scary part is over!**
+
+---
+
+## Phase 1: Core Models & Authentication (Week 1-2)
+
+### 🎯 Goal: Expand your working foundation with core models and basic authentication
+
+### 1.1 Complete Database Schema (Week 1)
+
+#### Step 1: Expand Prisma Schema Incrementally
+
+Update `prisma/schema.prisma` by adding models **one at a time**:
+
+```prisma
+// Add to existing schema.prisma
+
+// Profile information (linked to User)
+model Profile {
+  id           String    @id @default(uuid())
+  userId       String    @unique
+  firstName    String
+  lastName     String
+  phone        String?
+  address      String?
+  dateOfBirth  DateTime?
+  avatar       String?   // URL to profile image
+  emergencyContact String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  // Relations
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("profiles")
+}
+
+// Update User model to include Profile relation
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(STUDENT)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  emailVerified Boolean  @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  // Relations
+  profile      Profile?
+  sessions     Session[]
+  studentProfile Student?
+  teacherProfile Teacher?
+  parentProfile  Parent?
+  
+  @@map("users")
+}
+
+// Session management for security
+model Session {
+  id          String   @id @default(uuid())
+  userId      String
+  token       String   @unique
+  expiresAt   DateTime
+  ipAddress   String?
+  userAgent   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("sessions")
+}
+```
+
+#### ✅ Validation Checkpoint 1.1:
+```bash
+npx prisma migrate dev --name add_profiles_sessions
+npx prisma generate
+```
+**Expected Result**: Migration succeeds, new tables created.
+
+#### Step 2: Add Academic Hierarchy Models
+
+```prisma
+// Add these models to schema.prisma
+
+model AcademicYear {
+  id        String   @id @default(uuid())
+  year      String   @unique // e.g., "2024-2025"
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  classes   Class[]
+  
+  @@map("academic_years")
+}
+
+model Class {
+  id             String       @id @default(uuid())
+  name           String       // e.g., "Grade 5A"
+  grade          Int          // 1-12
+  section        String       // A, B, C, etc.
+  capacity       Int          @default(30)
+  academicYearId String
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  // Relations
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+  subjects       Subject[]
+  students       Student[]
+  
+  @@unique([grade, section, academicYearId])
+  @@map("classes")
+}
+
+model Subject {
+  id          String   @id @default(uuid())
+  name        String   // e.g., "Mathematics"
+  code        String   // e.g., "MATH-5A"
+  classId     String
+  credits     Int      @default(1)
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  class       Class    @relation(fields: [classId], references: [id])
+  
+  @@unique([code, classId])
+  @@map("subjects")
+}
+```
+
+#### ✅ Validation Checkpoint 1.2:
+```bash
+npx prisma migrate dev --name add_academic_models
+```
+
+#### Step 3: Add User Role-Specific Models
+
+```prisma
+// Add these models to schema.prisma
+
+model Student {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  studentId     String    @unique // School-specific ID like "STU2024001"
+  classId       String
+  rollNumber    String
+  admissionDate DateTime
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class         Class     @relation(fields: [classId], references: [id])
+  parents       ParentStudent[]
+  
+  @@unique([rollNumber, classId])
+  @@map("students")
+}
+
+model Teacher {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  teacherId     String   @unique // School-specific ID like "TCH2024001"
+  qualification String
+  experience    Int      // Years of experience
+  joiningDate   DateTime
+  salary        Decimal? @db.Decimal(10, 2)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("teachers")
+}
+
+model Parent {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  parentId        String   @unique // School-specific ID like "PAR2024001"
+  occupation      String?
+  relationshipType String  // Father, Mother, Guardian
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children        ParentStudent[]
+  
+  @@map("parents")
+}
+
+model ParentStudent {
+  id               String   @id @default(uuid())
+  parentId         String
+  studentId        String
+  relationshipType String   // Father, Mother, Guardian
+  isPrimary        Boolean  @default(false) // Primary contact
+  createdAt        DateTime @default(now())
+  
+  // Relations
+  parent           Parent   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student          Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  @@unique([parentId, studentId])
+  @@map("parent_students")
+}
+
+// Expand UserRole enum
+enum UserRole {
+  STUDENT
+  TEACHER
+  PARENT
+  ADMIN
+  STUDENT_COORDINATOR
+  LIBRARIAN
+  MEDIA_COORDINATOR
+}
+```
+
+#### ✅ Validation Checkpoint 1.3:
+```bash
+npx prisma migrate dev --name add_user_roles
+npx prisma studio
+```
+**Expected Result**: All tables visible in Prisma Studio with proper relationships.
+
+### 1.2 Authentication System Implementation (Week 1-2)
+
+#### Step 1: Create Authentication API Routes
+
+Create `src/app/api/v1/auth/register/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { hashPassword, generateUniqueId, UserRole } from '@/lib/auth';
+import { z } from 'zod';
+
+const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  role: z.nativeEnum(UserRole),
+  phone: z.string().optional(),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const validatedData = registerSchema.parse(body);
+    
+    const { email, password, firstName, lastName, role, phone } = validatedData;
+    
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+    
+    if (existingUser) {
+      return NextResponse.json(
+        { success: false, error: "User already exists" },
+        { status: 409 }
+      );
+    }
+    
+    // Hash password
+    const passwordHash = await hashPassword(password);
+    
+    // Create user with profile in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Create user
+      const user = await tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          role,
+        }
+      });
+      
+      // Create profile
+      const profile = await tx.profile.create({
+        data: {
+          userId: user.id,
+          firstName,
+          lastName,
+          phone,
+        }
+      });
+      
+      // Create role-specific profile
+      let roleProfile = null;
+      switch (role) {
+        case UserRole.STUDENT:
+          roleProfile = await tx.student.create({
+            data: {
+              userId: user.id,
+              studentId: generateUniqueId('STU'),
+              classId: '', // Will be assigned later
+              rollNumber: '', // Will be assigned later
+              admissionDate: new Date(),
+            }
+          });
+          break;
+          
+        case UserRole.TEACHER:
+          roleProfile = await tx.teacher.create({
+            data: {
+              userId: user.id,
+              teacherId: generateUniqueId('TCH'),
+              qualification: '',
+              experience: 0,
+              joiningDate: new Date(),
+            }
+          });
+          break;
+          
+        case UserRole.PARENT:
+          roleProfile = await tx.parent.create({
+            data: {
+              userId: user.id,
+              parentId: generateUniqueId('PAR'),
+              relationshipType: 'Parent',
+            }
+          });
+          break;
+      }
+      
+      return { user, profile, roleProfile };
+    });
+    
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: result.user.id,
+        email: result.user.email,
+        role: result.user.role,
+        profile: result.profile,
+      },
+      message: "User registered successfully"
+    });
+    
+  } catch (error: any) {
+    console.error('Registration error:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: "Invalid input data", details: error.errors },
+        { status: 400 }
+      );
+    }
+    
+    return NextResponse.json(
+      { success: false, error: "Registration failed" },
+      { status: 500 }
+    );
+  }
+}
+```
+
+#### Step 2: Create Login API Route
+
+Create `src/app/api/v1/auth/login/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { verifyPassword, generateToken } from '@/lib/auth';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email, password } = loginSchema.parse(body);
+    
+    // Find user with profile
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        profile: true,
+      }
+    });
+    
+    if (!user || !user.isActive) {
+      return NextResponse.json(
+        { success: false, error: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
+    
+    // Verify password
+    const passwordValid = await verifyPassword(password, user.passwordHash);
+    if (!passwordValid) {
+      return NextResponse.json(
+        { success: false, error: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
+    
+    // Generate JWT token
+    const token = generateToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
+    
+    // Update last login time
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    });
+    
+    // Create session record
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        token,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+        userAgent: request.headers.get('user-agent') || 'unknown',
+      }
+    });
+    
+    const response = NextResponse.json({
+      success: true,
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          profile: user.profile,
+        },
+        token,
+      },
+      message: "Login successful"
+    });
+    
+    // Set HTTP-only cookie for additional security
+    response.cookies.set('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+    
+    return response;
+    
+  } catch (error: any) {
+    console.error('Login error:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: "Invalid input data" },
+        { status: 400 }
+      );
+    }
+    
+    return NextResponse.json(
+      { success: false, error: "Login failed" },
+      { status: 500 }
+    );
+  }
+}
+```
+
+#### ✅ Validation Checkpoint 1.4:
+```bash
+# Test registration
+curl -X POST http://localhost:3000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@school.com",
+    "password": "admin123456",
+    "firstName": "Admin",
+    "lastName": "User",
+    "role": "ADMIN",
+    "phone": "1234567890"
+  }'
+
+# Test login
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@school.com",
+    "password": "admin123456"
+  }'
+```
+**Expected Result**: Both requests return success with proper user data and JWT token.
+
+### 🎉 Phase 1 Success Metrics:
+- ✅ Complete database schema with all core models
+- ✅ User registration works with profile creation
+- ✅ User login works with JWT token generation
+- ✅ Role-specific profiles are created automatically
+- ✅ Session tracking is implemented
+- ✅ All relationships between models work correctly
+
+**Great job! You now have a solid authentication system and complete data models.**
+
+---
 
 4. **System Models**
    ```prisma
@@ -57,24 +849,440 @@ A comprehensive, secure school management system backend built with Next.js 14+ 
    SystemSettings (key, value, description, category, updatedBy, updatedAt)
    ```
 
-#### Database Features:
+## Phase 2: API Infrastructure & Security (Week 2-3)
 
-- ✅ UUID primary keys (no exposed integers)
-- ✅ Soft delete with `deletedAt` timestamps
-- ✅ Audit trails for all sensitive operations
-- ✅ Timestamps (`createdAt`, `updatedAt`) on all models
-- ✅ JSON fields for flexible metadata
-- ✅ Unique constraints and proper indexing
-- ✅ Foreign key constraints with cascading rules
+### 🎯 Goal: Build robust API foundation with security middleware
 
-#### Migration Strategy:
+### 2.1 Authentication Middleware (Week 2)
 
-```bash
-# Development setup
-npx prisma migrate dev --name init_schema
-npx prisma generate
-npx prisma db seed
+#### Step 1: Create Authentication Middleware
+
+Create `src/lib/middleware.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyToken, hasRole, UserRole } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+export interface AuthenticatedRequest extends NextRequest {
+  user?: {
+    userId: string;
+    email: string;
+    role: UserRole;
+  };
+}
+
+export function withAuth(requiredRoles?: UserRole[]) {
+  return async function middleware(
+    request: NextRequest,
+    handler: (req: AuthenticatedRequest) => Promise<NextResponse>
+  ) {
+    try {
+      // Get token from header or cookie
+      const authHeader = request.headers.get('authorization');
+      const cookieToken = request.cookies.get('auth-token')?.value;
+      
+      const token = authHeader?.replace('Bearer ', '') || cookieToken;
+      
+      if (!token) {
+        return NextResponse.json(
+          { success: false, error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      
+      // Verify JWT token
+      const payload = verifyToken(token);
+      
+      // Check if session is still active
+      const session = await prisma.session.findFirst({
+        where: {
+          token,
+          isActive: true,
+          expiresAt: {
+            gt: new Date()
+          }
+        }
+      });
+      
+      if (!session) {
+        return NextResponse.json(
+          { success: false, error: 'Session expired' },
+          { status: 401 }
+        );
+      }
+      
+      // Check role permissions
+      if (requiredRoles && !hasRole(payload.role, requiredRoles)) {
+        return NextResponse.json(
+          { success: false, error: 'Insufficient permissions' },
+          { status: 403 }
+        );
+      }
+      
+      // Add user to request
+      const authenticatedRequest = request as AuthenticatedRequest;
+      authenticatedRequest.user = payload;
+      
+      return handler(authenticatedRequest);
+      
+    } catch (error) {
+      console.error('Authentication error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+  };
+}
+
+// Rate limiting helper
+const rateLimitMap = new Map();
+
+export function withRateLimit(maxRequests: number = 100, windowMs: number = 60000) {
+  return function (handler: Function) {
+    return async function (request: NextRequest) {
+      const ip = request.headers.get('x-forwarded-for') || 'unknown';
+      const now = Date.now();
+      const windowStart = now - windowMs;
+      
+      // Clean old entries
+      const requests = rateLimitMap.get(ip) || [];
+      const validRequests = requests.filter((time: number) => time > windowStart);
+      
+      if (validRequests.length >= maxRequests) {
+        return NextResponse.json(
+          { success: false, error: 'Rate limit exceeded' },
+          { status: 429 }
+        );
+      }
+      
+      // Add current request
+      validRequests.push(now);
+      rateLimitMap.set(ip, validRequests);
+      
+      return handler(request);
+    };
+  };
+}
 ```
+
+#### Step 2: Create Protected Route Example
+
+Create `src/app/api/v1/profile/route.ts`:
+
+```typescript
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { withAuth, AuthenticatedRequest } from '@/lib/middleware';
+import { UserRole } from '@/lib/auth';
+
+async function handleGetProfile(request: AuthenticatedRequest) {
+  try {
+    const userId = request.user!.userId;
+    
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: true,
+        studentProfile: true,
+        teacherProfile: true,
+        parentProfile: {
+          include: {
+            children: {
+              include: {
+                student: {
+                  include: {
+                    class: true,
+                    user: {
+                      include: {
+                        profile: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found' },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        profile: user.profile,
+        roleProfile: user.studentProfile || user.teacherProfile || user.parentProfile,
+      }
+    });
+    
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch profile' },
+      { status: 500 }
+    );
+  }
+}
+
+export const GET = withAuth()(handleGetProfile);
+```
+
+#### ✅ Validation Checkpoint 2.1:
+```bash
+# Test protected route without token
+curl http://localhost:3000/api/v1/profile
+
+# Test with valid token (use token from login response)
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     http://localhost:3000/api/v1/profile
+```
+**Expected Result**: First request returns 401, second returns user profile.
+
+### 2.2 CRUD Operations for Core Models (Week 2-3)
+
+#### Step 1: Students API
+
+Create `src/app/api/v1/students/route.ts`:
+
+```typescript
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { withAuth, withRateLimit, AuthenticatedRequest } from '@/lib/middleware';
+import { UserRole } from '@/lib/auth';
+import { z } from 'zod';
+
+const createStudentSchema = z.object({
+  userId: z.string().uuid(),
+  classId: z.string().uuid(),
+  rollNumber: z.string().min(1),
+});
+
+async function handleGetStudents(request: AuthenticatedRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const classId = searchParams.get('classId');
+    
+    const where = {
+      isActive: true,
+      ...(classId && { classId }),
+    };
+    
+    const [students, total] = await Promise.all([
+      prisma.student.findMany({
+        where,
+        include: {
+          user: {
+            include: {
+              profile: true
+            }
+          },
+          class: true,
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { rollNumber: 'asc' }
+      }),
+      prisma.student.count({ where })
+    ]);
+    
+    return NextResponse.json({
+      success: true,
+      data: students,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+    
+  } catch (error) {
+    console.error('Students fetch error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch students' },
+      { status: 500 }
+    );
+  }
+}
+
+async function handleCreateStudent(request: AuthenticatedRequest) {
+  try {
+    const body = await request.json();
+    const { userId, classId, rollNumber } = createStudentSchema.parse(body);
+    
+    // Check if user exists and doesn't already have a student profile
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { studentProfile: true }
+    });
+    
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found' },
+        { status: 404 }
+      );
+    }
+    
+    if (user.studentProfile) {
+      return NextResponse.json(
+        { success: false, error: 'User already has a student profile' },
+        { status: 400 }
+      );
+    }
+    
+    // Create student profile
+    const student = await prisma.student.create({
+      data: {
+        userId,
+        studentId: `STU${Date.now()}`, // Generate unique ID
+        classId,
+        rollNumber,
+        admissionDate: new Date(),
+      },
+      include: {
+        user: {
+          include: {
+            profile: true
+          }
+        },
+        class: true,
+      }
+    });
+    
+    return NextResponse.json({
+      success: true,
+      data: student,
+      message: 'Student created successfully'
+    });
+    
+  } catch (error: any) {
+    console.error('Student creation error:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid input data', details: error.errors },
+        { status: 400 }
+      );
+    }
+    
+    return NextResponse.json(
+      { success: false, error: 'Failed to create student' },
+      { status: 500 }
+    );
+  }
+}
+
+export const GET = withRateLimit()(withAuth([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT_COORDINATOR])(handleGetStudents));
+export const POST = withAuth([UserRole.ADMIN, UserRole.STUDENT_COORDINATOR])(handleCreateStudent);
+```
+
+#### ✅ Validation Checkpoint 2.2:
+```bash
+# Test creating academic year and class first
+curl -X POST http://localhost:3000/api/v1/academic-years \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"year":"2024-2025","startDate":"2024-09-01","endDate":"2025-06-30","isActive":true}'
+
+# Test students API
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+     http://localhost:3000/api/v1/students
+```
+
+### 2.3 Error Handling & Logging (Week 3)
+
+#### Step 1: Global Error Handler
+
+Create `src/lib/error-handler.ts`:
+
+```typescript
+import { NextResponse } from 'next/server';
+import { ZodError } from 'zod';
+import { Prisma } from '@prisma/client';
+
+export interface ApiError extends Error {
+  code?: string;
+  statusCode?: number;
+}
+
+export function handleApiError(error: unknown): NextResponse {
+  console.error('API Error:', error);
+  
+  // Zod validation errors
+  if (error instanceof ZodError) {
+    return NextResponse.json({
+      success: false,
+      error: 'Validation failed',
+      details: error.errors
+    }, { status: 400 });
+  }
+  
+  // Prisma errors
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    switch (error.code) {
+      case 'P2002':
+        return NextResponse.json({
+          success: false,
+          error: 'Record already exists'
+        }, { status: 409 });
+        
+      case 'P2025':
+        return NextResponse.json({
+          success: false,
+          error: 'Record not found'
+        }, { status: 404 });
+        
+      default:
+        return NextResponse.json({
+          success: false,
+          error: 'Database error'
+        }, { status: 500 });
+    }
+  }
+  
+  // Custom API errors
+  if (error instanceof Error && 'statusCode' in error) {
+    return NextResponse.json({
+      success: false,
+      error: error.message
+    }, { status: (error as ApiError).statusCode || 500 });
+  }
+  
+  // Generic errors
+  return NextResponse.json({
+    success: false,
+    error: 'Internal server error'
+  }, { status: 500 });
+}
+```
+
+#### ✅ Validation Checkpoint 2.3:
+Update your API routes to use the error handler and test error scenarios.
+
+### 🎉 Phase 2 Success Metrics:
+- ✅ Authentication middleware protects routes correctly
+- ✅ Rate limiting prevents abuse
+- ✅ CRUD operations work for core models
+- ✅ Proper error handling and validation
+- ✅ Role-based access control implemented
+- ✅ Pagination and filtering work correctly
+
+**Excellent! You now have a secure, robust API foundation.**
+
+---
 
 ### 1.2 Authentication & Security System (Week 1-2)
 
@@ -126,69 +1334,147 @@ ADMIN > STUDENT_COORDINATOR > TEACHER/LIBRARIAN/MEDIA_COORDINATOR > PARENT/STUDE
 - STUDENT: Own data only
 ```
 
-### 1.3 API Infrastructure (Week 2-3)
+### 🎯 Final Implementation Strategy
 
-#### API Route Structure:
+## Development Confidence Checklist
 
-```
-app/api/v1/
-├── auth/
-│   ├── login/route.ts
-│   ├── logout/route.ts
-│   ├── register/route.ts
-│   ├── reset-password/route.ts
-│   └── verify-email/route.ts
-├── users/
-│   ├── route.ts (GET, POST)
-│   ├── [id]/route.ts (GET, PUT, DELETE)
-│   ├── profile/route.ts
-│   └── change-password/route.ts
-├── students/
-├── teachers/
-├── classes/
-├── subjects/
-└── admin/
-```
+### Week 1 Milestones
+- [ ] Database schema compiles without errors
+- [ ] Can create and read users from database
+- [ ] Basic API endpoints return correct responses
+- [ ] Authentication (login/register) works completely
+- [ ] JWT tokens are generated and verified correctly
 
-#### API Standards:
+### Week 2 Milestones
+- [ ] Protected routes require authentication
+- [ ] Role-based access control works
+- [ ] CRUD operations for students, teachers, parents
+- [ ] Error handling catches all edge cases
+- [ ] API follows consistent response format
 
-```typescript
-// Response Format:
-{
-  data?: any,
-  error?: {
-    code: string,
-    message: string,
-    details?: any
-  },
-  pagination?: {
-    page: number,
-    limit: number,
-    total: number,
-    totalPages: number
-  }
-}
+### Week 3 Milestones
+- [ ] Academic year and class management
+- [ ] Attendance system functional
+- [ ] Data validation prevents bad inputs
+- [ ] Database relationships work correctly
+- [ ] Performance is acceptable for test data
 
-// Error Codes:
-- VALIDATION_ERROR (400)
-- UNAUTHORIZED (401)
-- FORBIDDEN (403)
-- NOT_FOUND (404)
-- RATE_LIMITED (429)
-- INTERNAL_ERROR (500)
+### Week 4+ Milestones
+- [ ] Assignment submission system
+- [ ] Grade management
+- [ ] Parent-student relationships
+- [ ] File upload security
+- [ ] Comprehensive testing
+
+## Risk Mitigation Strategies
+
+### 1. Start Small, Build Incrementally
+- ✅ **Don't try to build everything at once**
+- ✅ **Get one feature completely working before starting the next**
+- ✅ **Test each component thoroughly before moving on**
+
+### 2. Backup and Version Control
+```bash
+# Always work on feature branches
+git checkout -b feature/authentication
+git commit -m "Add user authentication"
+git push origin feature/authentication
+
+# Create daily backups
+cp -r hcs-app hcs-app-backup-$(date +%Y%m%d)
 ```
 
-#### Request/Response Validation:
+### 3. Rollback Plans
+```bash
+# If something breaks, you can always rollback
+git checkout main
+git reset --hard HEAD~1  # Go back one commit
 
-```typescript
-// Every endpoint must have:
-1. Input validation with Zod schemas
-2. Output sanitization
-3. RBAC permission checks
-4. Rate limiting
-5. Audit logging
-6. Error handling
+# Or restore from backup
+rm -rf hcs-app
+mv hcs-app-backup-20240101 hcs-app
 ```
+
+### 4. Test Everything Immediately
+```bash
+# After each major change, test immediately
+npm run build    # Check for TypeScript errors
+npm run dev      # Start development server
+# Test API endpoints with curl or Postman
+```
+
+---
+
+## Next Steps After Completing Foundation
+
+### Phase 4: Assignment & Grade Management
+- Assignment creation and submission
+- Grade entry and calculation
+- Student progress tracking
+- Parent grade access
+
+### Phase 5: Communication System
+- In-app messaging
+- Announcements
+- Email notifications
+- Parent-teacher chat
+
+### Phase 6: Fee Management
+- Fee structure setup
+- Payment processing
+- Receipt generation
+- Payment tracking
+
+### Phase 7: Advanced Features
+- Library management
+- Event calendar
+- Report generation
+- Mobile app API
+
+### Phase 8: Production Deployment
+- Environment setup
+- Security hardening
+- Performance optimization
+- Monitoring and logging
+
+---
+
+## 🚀 Getting Started Right Now
+
+### Step 1: Create Your First Branch
+```bash
+cd /home/runner/work/HCS/HCS/hcs-app
+git checkout -b feature/backend-foundation
+```
+
+### Step 2: Create Prisma Directory
+```bash
+mkdir prisma
+```
+
+### Step 3: Follow Phase 0 Instructions Above
+- Start with the Prisma schema
+- Create your first API endpoint
+- Test database connection
+- Get first success! 🎉
+
+### Step 4: Celebrate Small Wins
+- Each working API endpoint is a victory
+- Each successful database operation builds confidence
+- Each test that passes proves you're on the right track
+
+---
+
+## Remember: You've Got This! 💪
+
+- **This project is absolutely doable** - thousands of developers have built similar systems
+- **You have all the tools and knowledge** - TypeScript, Next.js, Prisma are well-documented
+- **Start small and build up** - every expert was once a beginner
+- **The foundation is already there** - your frontend structure shows you can build complex applications
+- **One step at a time** - focus on today's task, not the entire project
+
+### Most Important Rule: 
+**If you get stuck for more than 30 minutes, take a break. Come back with fresh eyes. The solution is usually simpler than you think.**
 
 ---
 
