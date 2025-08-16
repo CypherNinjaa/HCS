@@ -91,7 +91,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 			change: "+23 this month",
 			changeType: "increase",
 			icon: Users,
-			color: "from-blue-500 to-cyan-500",
+			color: "bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-600 dark:to-cyan-600",
 			onClick: () => setActiveSection("students"),
 		},
 		{
@@ -100,7 +100,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 			change: "+4 new hires",
 			changeType: "increase",
 			icon: GraduationCap,
-			color: "from-purple-500 to-pink-500",
+			color: "bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-600 dark:to-pink-600",
 			onClick: () => setActiveSection("teachers"),
 		},
 		{
@@ -109,7 +109,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 			change: "87% collected",
 			changeType: "increase",
 			icon: DollarSign,
-			color: "from-green-500 to-emerald-500",
+			color: "bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-600 dark:to-emerald-600",
 			onClick: () => setActiveSection("fees"),
 		},
 		{
@@ -118,7 +118,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 			change: "+5.2% vs last term",
 			changeType: "increase",
 			icon: TrendingUp,
-			color: "from-orange-500 to-red-500",
+			color: "bg-gradient-to-r from-orange-500 to-red-500 dark:from-orange-600 dark:to-red-600",
 			onClick: () => setActiveSection("analytics"),
 		},
 		{
@@ -127,7 +127,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 			change: "All operational",
 			changeType: "neutral",
 			icon: BookOpen,
-			color: "from-indigo-500 to-purple-500",
+			color: "bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600",
 			onClick: () => setActiveSection("classes"),
 		},
 		{
@@ -136,7 +136,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 			change: "1 under maintenance",
 			changeType: "decrease",
 			icon: MapPin,
-			color: "from-teal-500 to-cyan-500",
+			color: "bg-gradient-to-r from-teal-500 to-cyan-500 dark:from-teal-600 dark:to-cyan-600",
 			onClick: () => setActiveSection("transport"),
 		},
 	];
@@ -192,7 +192,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 						</p>
 					</div>
 					<div className="flex gap-2">
-						<button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200">
+						<button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 dark:hover:from-blue-700 dark:hover:to-purple-800 transition-all duration-200">
 							<Plus className="h-4 w-4" />
 							Quick Add
 						</button>
@@ -219,7 +219,7 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 						>
 							<div className="flex items-center justify-between mb-4">
 								<div
-									className={`p-3 rounded-lg bg-gradient-to-r ${card.color} text-white group-hover:scale-110 transition-transform duration-300`}
+									className={`p-3 rounded-lg ${card.color} text-white group-hover:scale-110 transition-transform duration-300`}
 								>
 									<Icon className="h-6 w-6" />
 								</div>
@@ -325,37 +325,43 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 							{
 								label: "Add New Student",
 								icon: Users,
-								color: "blue",
+								bgClass: "bg-blue-100 dark:bg-blue-900/30",
+								iconClass: "text-blue-600 dark:text-blue-400",
 								section: "students",
 							},
 							{
 								label: "Create Teacher Account",
 								icon: GraduationCap,
-								color: "purple",
+								bgClass: "bg-purple-100 dark:bg-purple-900/30",
+								iconClass: "text-purple-600 dark:text-purple-400",
 								section: "teachers",
 							},
 							{
 								label: "Schedule Exam",
 								icon: Calendar,
-								color: "green",
+								bgClass: "bg-green-100 dark:bg-green-900/30",
+								iconClass: "text-green-600 dark:text-green-400",
 								section: "exams",
 							},
 							{
 								label: "Generate Report",
 								icon: BarChart3,
-								color: "orange",
+								bgClass: "bg-orange-100 dark:bg-orange-900/30",
+								iconClass: "text-orange-600 dark:text-orange-400",
 								section: "analytics",
 							},
 							{
 								label: "Manage Fees",
 								icon: DollarSign,
-								color: "emerald",
+								bgClass: "bg-emerald-100 dark:bg-emerald-900/30",
+								iconClass: "text-emerald-600 dark:text-emerald-400",
 								section: "fees",
 							},
 							{
 								label: "Send Notification",
 								icon: Bell,
-								color: "pink",
+								bgClass: "bg-pink-100 dark:bg-pink-900/30",
+								iconClass: "text-pink-600 dark:text-pink-400",
 								section: "notifications",
 							},
 						].map((action, index) => {
@@ -370,10 +376,10 @@ export function AdminOverview({ setActiveSection }: AdminOverviewProps) {
 									className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group"
 								>
 									<div
-										className={`p-2 rounded-lg bg-${action.color}-100 dark:bg-${action.color}-900/30 group-hover:scale-110 transition-transform duration-200`}
+										className={`p-2 rounded-lg ${action.bgClass} group-hover:scale-110 transition-transform duration-200`}
 									>
 										<Icon
-											className={`h-4 w-4 text-${action.color}-600 dark:text-${action.color}-400`}
+											className={`h-4 w-4 ${action.iconClass}`}
 										/>
 									</div>
 									<span className="text-sm font-medium text-gray-900 dark:text-white">
