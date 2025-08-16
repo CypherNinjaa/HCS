@@ -11,6 +11,7 @@ import {
 	Globe,
 } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface AdminHeaderProps {
 	isSidebarOpen: boolean;
@@ -129,6 +130,9 @@ export function AdminHeader({
 					<button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
 						<Settings className="h-5 w-5 text-gray-600 dark:text-gray-400" />
 					</button>
+
+					{/* Theme Toggle */}
+					<ThemeToggle />
 
 					{/* Admin Profile */}
 					<div className="flex items-center gap-3 ml-2">
