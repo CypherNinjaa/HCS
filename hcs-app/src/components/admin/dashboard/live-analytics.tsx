@@ -99,10 +99,10 @@ export function LiveAnalytics() {
 			{/* Header */}
 			<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 				<div>
-					<h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+					<h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
 						Live Analytics Dashboard
 					</h1>
-					<p className="text-gray-600 dark:text-gray-400">
+					<p className="text-muted-foreground">
 						Real-time insights and data visualizations
 					</p>
 				</div>
@@ -111,7 +111,7 @@ export function LiveAnalytics() {
 					<select
 						value={selectedTimeRange}
 						onChange={(e) => setSelectedTimeRange(e.target.value)}
-						className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+						className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
 					>
 						{timeRanges.map((range) => (
 							<option key={range.value} value={range.value}>
@@ -120,7 +120,7 @@ export function LiveAnalytics() {
 						))}
 					</select>
 
-					<button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+					<button className="flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors">
 						<Filter className="h-4 w-4" />
 						Filter
 					</button>
@@ -136,7 +136,7 @@ export function LiveAnalytics() {
 						{isRefreshing ? "Refreshing..." : "Refresh"}
 					</button>
 
-					<button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+					<button className="flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors">
 						<Download className="h-4 w-4" />
 						Export
 					</button>
@@ -153,7 +153,7 @@ export function LiveAnalytics() {
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: index * 0.1 }}
-							className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-gray-900/25 transition-all duration-300"
+							className="bg-card rounded-xl p-6 border border-border hover:shadow-lg transition-all duration-300"
 						>
 							<div className="flex items-center justify-between mb-4">
 								<div
@@ -164,10 +164,10 @@ export function LiveAnalytics() {
 								<div
 									className={`text-xs px-2 py-1 rounded-full ${
 										metric.changeType === "positive"
-											? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+											? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
 											: metric.changeType === "negative"
-											? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-											: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+											? "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+											: "bg-muted text-muted-foreground"
 									}`}
 								>
 									{metric.changeType === "positive" && "↗"}
@@ -175,10 +175,10 @@ export function LiveAnalytics() {
 									{metric.change}
 								</div>
 							</div>
-							<h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+							<h3 className="text-sm font-medium text-muted-foreground mb-1">
 								{metric.title}
 							</h3>
-							<p className="text-2xl font-bold text-gray-900 dark:text-white">
+							<p className="text-2xl font-bold text-foreground">
 								{metric.value}
 							</p>
 						</motion.div>
@@ -193,15 +193,15 @@ export function LiveAnalytics() {
 					initial={{ opacity: 0, x: -20 }}
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ delay: 0.3 }}
-					className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
+					className="bg-card rounded-xl p-6 border border-border"
 				>
 					<div className="flex items-center justify-between mb-6">
-						<h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+						<h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
 							<Users className="h-5 w-5" />
 							Student Enrollment Trend
 						</h3>
-						<button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-							<Maximize2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+						<button className="p-2 hover:bg-muted rounded-lg transition-colors">
+							<Maximize2 className="h-4 w-4 text-muted-foreground" />
 						</button>
 					</div>
 					<div className="h-64 flex items-end justify-between gap-2">
@@ -213,10 +213,10 @@ export function LiveAnalytics() {
 								transition={{ delay: 0.5 + index * 0.1, duration: 0.6 }}
 								className="flex-1 bg-gradient-to-t from-blue-500 to-cyan-400 rounded-t-lg relative group cursor-pointer"
 							>
-								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground border border-border text-xs px-2 py-1 rounded whitespace-nowrap">
 									{data.students} students
 								</div>
-								<div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-600 dark:text-gray-400">
+								<div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-muted-foreground">
 									{data.month}
 								</div>
 							</motion.div>
@@ -229,15 +229,15 @@ export function LiveAnalytics() {
 					initial={{ opacity: 0, x: 20 }}
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ delay: 0.4 }}
-					className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
+					className="bg-card rounded-xl p-6 border border-border"
 				>
 					<div className="flex items-center justify-between mb-6">
-						<h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+						<h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
 							<DollarSign className="h-5 w-5" />
 							Fee Collection Analysis
 						</h3>
-						<button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-							<Maximize2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+						<button className="p-2 hover:bg-muted rounded-lg transition-colors">
+							<Maximize2 className="h-4 w-4 text-muted-foreground" />
 						</button>
 					</div>
 					<div className="h-64 flex items-end justify-between gap-2">
@@ -249,10 +249,10 @@ export function LiveAnalytics() {
 								transition={{ delay: 0.6 + index * 0.1, duration: 0.6 }}
 								className="flex-1 bg-gradient-to-t from-green-500 to-emerald-400 rounded-t-lg relative group cursor-pointer"
 							>
-								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+								<div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground border border-border text-xs px-2 py-1 rounded whitespace-nowrap">
 									₹{(data.fees / 100000).toFixed(1)}L
 								</div>
-								<div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-600 dark:text-gray-400">
+								<div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-muted-foreground">
 									{data.month}
 								</div>
 							</motion.div>
@@ -268,9 +268,9 @@ export function LiveAnalytics() {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.5 }}
-					className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
+					className="bg-card rounded-xl p-6 border border-border"
 				>
-					<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+					<h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
 						<Clock className="h-5 w-5" />
 						Real-time Activities
 					</h3>
@@ -312,7 +312,7 @@ export function LiveAnalytics() {
 								initial={{ opacity: 0, x: -10 }}
 								animate={{ opacity: 1, x: 0 }}
 								transition={{ delay: 0.6 + index * 0.1 }}
-								className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+								className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
 							>
 								<div
 									className={`w-2 h-2 rounded-full ${
@@ -324,10 +324,10 @@ export function LiveAnalytics() {
 									}`}
 								/>
 								<div className="flex-1">
-									<p className="text-sm font-medium text-gray-900 dark:text-white">
+									<p className="text-sm font-medium text-foreground">
 										{activity.action}
 									</p>
-									<p className="text-xs text-gray-500 dark:text-gray-400">
+									<p className="text-xs text-muted-foreground">
 										{activity.user} • {activity.time}
 									</p>
 								</div>
@@ -341,9 +341,9 @@ export function LiveAnalytics() {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.6 }}
-					className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
+					className="bg-card rounded-xl p-6 border border-border"
 				>
-					<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+					<h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
 						<TrendingUp className="h-5 w-5" />
 						Top Performers
 					</h3>
@@ -385,7 +385,7 @@ export function LiveAnalytics() {
 								initial={{ opacity: 0, x: 10 }}
 								animate={{ opacity: 1, x: 0 }}
 								transition={{ delay: 0.7 + index * 0.1 }}
-								className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+								className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
 							>
 								<div
 									className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
@@ -401,15 +401,15 @@ export function LiveAnalytics() {
 									{student.rank}
 								</div>
 								<div className="flex-1">
-									<p className="text-sm font-medium text-gray-900 dark:text-white">
+									<p className="text-sm font-medium text-foreground">
 										{student.name}
 									</p>
-									<p className="text-xs text-gray-500 dark:text-gray-400">
+									<p className="text-xs text-muted-foreground">
 										{student.class}
 									</p>
 								</div>
 								<div className="text-right">
-									<p className="text-sm font-semibold text-gray-900 dark:text-white">
+									<p className="text-sm font-semibold text-foreground">
 										{student.score}
 									</p>
 								</div>
@@ -423,9 +423,9 @@ export function LiveAnalytics() {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.7 }}
-					className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
+					className="bg-card rounded-xl p-6 border border-border"
 				>
-					<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+					<h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
 						<BarChart3 className="h-5 w-5" />
 						System Health
 					</h3>
@@ -449,14 +449,12 @@ export function LiveAnalytics() {
 								className="space-y-2"
 							>
 								<div className="flex justify-between text-sm">
-									<span className="text-gray-600 dark:text-gray-400">
-										{item.metric}
-									</span>
-									<span className="font-medium text-gray-900 dark:text-white">
+									<span className="text-muted-foreground">{item.metric}</span>
+									<span className="font-medium text-foreground">
 										{item.value}%
 									</span>
 								</div>
-								<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+								<div className="w-full bg-muted rounded-full h-2">
 									<motion.div
 										initial={{ width: 0 }}
 										animate={{ width: `${item.value}%` }}

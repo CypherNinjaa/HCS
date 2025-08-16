@@ -7,10 +7,10 @@ export function ContentManagement() {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+				<h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
 					Content Management
 				</h1>
-				<p className="text-gray-600 dark:text-gray-400">
+				<p className="text-muted-foreground">
 					Inline website content editing and management
 				</p>
 			</div>
@@ -49,7 +49,7 @@ export function ContentManagement() {
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: index * 0.1 }}
-							className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
+							className="bg-card rounded-xl p-6 border border-border"
 						>
 							<div className="flex items-center gap-4">
 								<div
@@ -58,10 +58,10 @@ export function ContentManagement() {
 									<Icon className="h-6 w-6" />
 								</div>
 								<div>
-									<p className="text-2xl font-bold text-gray-900 dark:text-white">
+									<p className="text-2xl font-bold text-foreground">
 										{stat.value}
 									</p>
-									<p className="text-sm text-gray-600 dark:text-gray-400">
+									<p className="text-sm text-muted-foreground">
 										{stat.title}
 									</p>
 								</div>
@@ -75,12 +75,12 @@ export function ContentManagement() {
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.4 }}
-				className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
+				className="bg-card rounded-xl p-6 border border-border"
 			>
-				<h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+				<h2 className="text-lg font-semibold text-foreground mb-4">
 					Content Management Features
 				</h2>
-				<ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+				<ul className="space-y-2 text-sm text-muted-foreground">
 					<li>• Inline editing of website content</li>
 					<li>• Rich text editor with media support</li>
 					<li>• Multi-language content management</li>
