@@ -1,8 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User, Mail, GraduationCap, Heart, Users } from "lucide-react";
+import {
+	X,
+	User,
+	Mail,
+	GraduationCap,
+	Heart,
+	Users,
+	Key,
+	Eye,
+	EyeOff,
+	RefreshCw,
+	Copy,
+} from "lucide-react";
 import {
 	CreateStudentRequest,
 	UpdateStudentRequest,
@@ -30,6 +42,24 @@ export function StudentFormModal({
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [classes, setClasses] = useState<Class[]>([]);
+	const [showStudentPassword, setShowStudentPassword] = useState(false);
+	const [showParentPassword, setShowParentPassword] = useState(false);
+	const [studentEmailUsername, setStudentEmailUsername] = useState("");
+	const [studentEmailDomain, setStudentEmailDomain] = useState(
+		"happychildschool.com"
+	);
+	const [studentCustomDomain, setStudentCustomDomain] = useState("");
+	const [parentEmailUsername, setParentEmailUsername] = useState("");
+	const [parentEmailDomain, setParentEmailDomain] = useState(
+		"happychildschool.com"
+	);
+	const [parentCustomDomain, setParentCustomDomain] = useState("");
+	const [generatedCredentials, setGeneratedCredentials] = useState<{
+		studentEmail: string;
+		studentPassword: string;
+		parentEmail: string;
+		parentPassword: string;
+	} | null>(null);
 	const [formData, setFormData] = useState<CreateStudentRequest>({
 		firstName: "",
 		lastName: "",
@@ -112,7 +142,21 @@ export function StudentFormModal({
 
 		try {
 			if (mode === "create") {
-				await studentService.createStudent(formData);
+				// Include generated credentials in the request
+				const createData: CreateStudentRequest = {
+					...formData,
+					studentPassword: generatedCredentials?.studentPassword,
+					parentPassword: generatedCredentials?.parentPassword,
+				};
+
+				await studentService.createStudent(createData);
+
+				// Show success message with credentials info
+				if (generatedCredentials) {
+					alert(
+						`Student and Parent accounts created successfully!\n\nStudent Login:\nEmail: ${generatedCredentials.studentEmail}\nPassword: ${generatedCredentials.studentPassword}\n\nParent Login:\nEmail: ${generatedCredentials.parentEmail}\nPassword: ${generatedCredentials.parentPassword}\n\nPlease save these credentials securely!`
+					);
+				}
 			} else if (mode === "edit" && student) {
 				const updateData: UpdateStudentRequest = {
 					firstName: formData.firstName,
@@ -151,6 +195,114 @@ export function StudentFormModal({
 	};
 
 	const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+	// Generate secure password
+	const generatePassword = () => {
+		const chars =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+		let password = "";
+		for (let i = 0; i < 10; i++) {
+			password += chars.charAt(Math.floor(Math.random() * chars.length));
+		}
+		return password;
+	};
+
+	// Generate email from name
+	// Auto-generate credentials when names change
+	useEffect(() => {
+		if (mode === "create" && formData.firstName && formData.lastName) {
+			// Auto-suggest usernames based on names
+			const suggestedStudentUsername = `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}`;
+			const suggestedParentUsername = formData.parentName
+				? `${formData.parentName.split(" ")[0]?.toLowerCase()}.${
+						formData.parentName.split(" ")[1]?.toLowerCase() ||
+						formData.lastName.toLowerCase()
+				  }`
+				: `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}.parent`;
+
+			setStudentEmailUsername(suggestedStudentUsername);
+			setParentEmailUsername(suggestedParentUsername);
+
+			// Build complete emails
+			const studentDomain =
+				studentEmailDomain === "custom"
+					? studentCustomDomain
+					: studentEmailDomain;
+			const parentDomain =
+				parentEmailDomain === "custom" ? parentCustomDomain : parentEmailDomain;
+
+			const studentEmail = `${suggestedStudentUsername}@${studentDomain}`;
+			const parentEmail = `${suggestedParentUsername}@${parentDomain}`;
+
+			setFormData((prev) => ({
+				...prev,
+				email: studentEmail,
+				parentEmail: parentEmail,
+			}));
+
+			setGeneratedCredentials({
+				studentEmail,
+				studentPassword: generatePassword(),
+				parentEmail,
+				parentPassword: generatePassword(),
+			});
+		}
+	}, [
+		formData.firstName,
+		formData.lastName,
+		formData.parentName,
+		mode,
+		studentEmailDomain,
+		studentCustomDomain,
+		parentEmailDomain,
+		parentCustomDomain,
+	]);
+
+	// Update emails when username or domain changes
+	const updateStudentEmail = useCallback(() => {
+		if (studentEmailUsername) {
+			const domain =
+				studentEmailDomain === "custom"
+					? studentCustomDomain
+					: studentEmailDomain;
+			const email = `${studentEmailUsername}@${domain}`;
+			setFormData((prev) => ({ ...prev, email }));
+			setGeneratedCredentials((prev) =>
+				prev ? { ...prev, studentEmail: email } : null
+			);
+		}
+	}, [studentEmailUsername, studentEmailDomain, studentCustomDomain]);
+
+	const updateParentEmail = useCallback(() => {
+		if (parentEmailUsername) {
+			const domain =
+				parentEmailDomain === "custom" ? parentCustomDomain : parentEmailDomain;
+			const email = `${parentEmailUsername}@${domain}`;
+			setFormData((prev) => ({ ...prev, parentEmail: email }));
+			setGeneratedCredentials((prev) =>
+				prev ? { ...prev, parentEmail: email } : null
+			);
+		}
+	}, [parentEmailUsername, parentEmailDomain, parentCustomDomain]);
+
+	// Update emails when domain changes
+	useEffect(() => {
+		updateStudentEmail();
+	}, [updateStudentEmail]);
+
+	useEffect(() => {
+		updateParentEmail();
+	}, [updateParentEmail]);
+
+	// Copy to clipboard function
+	const copyToClipboard = async (text: string) => {
+		try {
+			await navigator.clipboard.writeText(text);
+			// You could add a toast notification here
+		} catch (err) {
+			console.error("Failed to copy: ", err);
+		}
+	};
 
 	return (
 		<AnimatePresence>
@@ -362,6 +514,340 @@ export function StudentFormModal({
 										</div>
 									</div>
 								</div>
+
+								{/* Login Credentials - Show only in create mode */}
+								{mode === "create" && generatedCredentials && (
+									<div>
+										<h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+											<Key className="h-5 w-5" />
+											Generated Login Credentials
+										</h3>
+										<div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-4">
+											<p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
+												⚠️ <strong>Important:</strong> Save these credentials
+												safely. They will be needed for first-time login.
+											</p>
+
+											{/* Custom Email Creation Section */}
+											<div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+												<h4 className="font-medium text-foreground flex items-center gap-2">
+													<Mail className="h-4 w-4" />
+													Customize Email Addresses
+												</h4>
+
+												{/* Student Email Customization */}
+												<div className="space-y-3">
+													<h5 className="text-sm font-medium text-foreground">
+														Student Email:
+													</h5>
+													<div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+														<div>
+															<label className="block text-xs font-medium text-muted-foreground mb-1">
+																Username
+															</label>
+															<input
+																type="text"
+																value={studentEmailUsername}
+																onChange={(e) =>
+																	setStudentEmailUsername(e.target.value)
+																}
+																placeholder="e.g., john.doe"
+																className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+															/>
+														</div>
+														<div>
+															<label className="block text-xs font-medium text-muted-foreground mb-1">
+																Domain
+															</label>
+															<select
+																value={studentEmailDomain}
+																onChange={(e) =>
+																	setStudentEmailDomain(e.target.value)
+																}
+																className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+															>
+																<option value="happychildschool.com">
+																	@happychildschool.com
+																</option>
+																<option value="gmail.com">@gmail.com</option>
+																<option value="yahoo.com">@yahoo.com</option>
+																<option value="outlook.com">
+																	@outlook.com
+																</option>
+																<option value="custom">Custom Domain</option>
+															</select>
+														</div>
+														{studentEmailDomain === "custom" && (
+															<div>
+																<label className="block text-xs font-medium text-muted-foreground mb-1">
+																	Custom Domain
+																</label>
+																<input
+																	type="text"
+																	value={studentCustomDomain}
+																	onChange={(e) =>
+																		setStudentCustomDomain(e.target.value)
+																	}
+																	placeholder="example.com"
+																	className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+																/>
+															</div>
+														)}
+													</div>
+												</div>
+
+												{/* Parent Email Customization */}
+												<div className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+													<h5 className="text-sm font-medium text-foreground">
+														Parent Email:
+													</h5>
+													<div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+														<div>
+															<label className="block text-xs font-medium text-muted-foreground mb-1">
+																Username
+															</label>
+															<input
+																type="text"
+																value={parentEmailUsername}
+																onChange={(e) =>
+																	setParentEmailUsername(e.target.value)
+																}
+																placeholder="e.g., parent.john"
+																className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+															/>
+														</div>
+														<div>
+															<label className="block text-xs font-medium text-muted-foreground mb-1">
+																Domain
+															</label>
+															<select
+																value={parentEmailDomain}
+																onChange={(e) =>
+																	setParentEmailDomain(e.target.value)
+																}
+																className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+															>
+																<option value="happychildschool.com">
+																	@happychildschool.com
+																</option>
+																<option value="gmail.com">@gmail.com</option>
+																<option value="yahoo.com">@yahoo.com</option>
+																<option value="outlook.com">
+																	@outlook.com
+																</option>
+																<option value="custom">Custom Domain</option>
+															</select>
+														</div>
+														{parentEmailDomain === "custom" && (
+															<div>
+																<label className="block text-xs font-medium text-muted-foreground mb-1">
+																	Custom Domain
+																</label>
+																<input
+																	type="text"
+																	value={parentCustomDomain}
+																	onChange={(e) =>
+																		setParentCustomDomain(e.target.value)
+																	}
+																	placeholder="example.com"
+																	className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+																/>
+															</div>
+														)}
+													</div>
+												</div>
+											</div>
+
+											{/* Student Credentials */}
+											<div className="space-y-3">
+												<h4 className="font-medium text-foreground">
+													Student Login:
+												</h4>
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+													<div>
+														<label className="block text-xs font-medium text-muted-foreground mb-1">
+															Email (Username)
+														</label>
+														<div className="flex items-center space-x-2">
+															<input
+																type="text"
+																value={generatedCredentials.studentEmail}
+																readOnly
+																className="flex-1 px-3 py-2 text-sm bg-background border border-border rounded-md"
+															/>
+															<button
+																type="button"
+																onClick={() =>
+																	copyToClipboard(
+																		generatedCredentials.studentEmail
+																	)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title="Copy email"
+															>
+																<Copy className="h-4 w-4" />
+															</button>
+														</div>
+													</div>
+													<div>
+														<label className="block text-xs font-medium text-muted-foreground mb-1">
+															Password
+														</label>
+														<div className="flex items-center space-x-2">
+															<input
+																type={showStudentPassword ? "text" : "password"}
+																value={generatedCredentials.studentPassword}
+																readOnly
+																className="flex-1 px-3 py-2 text-sm bg-background border border-border rounded-md"
+															/>
+															<button
+																type="button"
+																onClick={() =>
+																	setShowStudentPassword(!showStudentPassword)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title={
+																	showStudentPassword
+																		? "Hide password"
+																		: "Show password"
+																}
+															>
+																{showStudentPassword ? (
+																	<EyeOff className="h-4 w-4" />
+																) : (
+																	<Eye className="h-4 w-4" />
+																)}
+															</button>
+															<button
+																type="button"
+																onClick={() =>
+																	copyToClipboard(
+																		generatedCredentials.studentPassword
+																	)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title="Copy password"
+															>
+																<Copy className="h-4 w-4" />
+															</button>
+															<button
+																type="button"
+																onClick={() =>
+																	setGeneratedCredentials((prev) =>
+																		prev
+																			? {
+																					...prev,
+																					studentPassword: generatePassword(),
+																			  }
+																			: null
+																	)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title="Generate new password"
+															>
+																<RefreshCw className="h-4 w-4" />
+															</button>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											{/* Parent Credentials */}
+											<div className="space-y-3 pt-3 border-t border-blue-200 dark:border-blue-800">
+												<h4 className="font-medium text-foreground">
+													Parent Login:
+												</h4>
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+													<div>
+														<label className="block text-xs font-medium text-muted-foreground mb-1">
+															Email (Username)
+														</label>
+														<div className="flex items-center space-x-2">
+															<input
+																type="text"
+																value={generatedCredentials.parentEmail}
+																readOnly
+																className="flex-1 px-3 py-2 text-sm bg-background border border-border rounded-md"
+															/>
+															<button
+																type="button"
+																onClick={() =>
+																	copyToClipboard(
+																		generatedCredentials.parentEmail
+																	)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title="Copy email"
+															>
+																<Copy className="h-4 w-4" />
+															</button>
+														</div>
+													</div>
+													<div>
+														<label className="block text-xs font-medium text-muted-foreground mb-1">
+															Password
+														</label>
+														<div className="flex items-center space-x-2">
+															<input
+																type={showParentPassword ? "text" : "password"}
+																value={generatedCredentials.parentPassword}
+																readOnly
+																className="flex-1 px-3 py-2 text-sm bg-background border border-border rounded-md"
+															/>
+															<button
+																type="button"
+																onClick={() =>
+																	setShowParentPassword(!showParentPassword)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title={
+																	showParentPassword
+																		? "Hide password"
+																		: "Show password"
+																}
+															>
+																{showParentPassword ? (
+																	<EyeOff className="h-4 w-4" />
+																) : (
+																	<Eye className="h-4 w-4" />
+																)}
+															</button>
+															<button
+																type="button"
+																onClick={() =>
+																	copyToClipboard(
+																		generatedCredentials.parentPassword
+																	)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title="Copy password"
+															>
+																<Copy className="h-4 w-4" />
+															</button>
+															<button
+																type="button"
+																onClick={() =>
+																	setGeneratedCredentials((prev) =>
+																		prev
+																			? {
+																					...prev,
+																					parentPassword: generatePassword(),
+																			  }
+																			: null
+																	)
+																}
+																className="p-2 hover:bg-muted rounded-md transition-colors"
+																title="Generate new password"
+															>
+																<RefreshCw className="h-4 w-4" />
+															</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								)}
 
 								{/* Parent Information */}
 								{mode === "create" && (

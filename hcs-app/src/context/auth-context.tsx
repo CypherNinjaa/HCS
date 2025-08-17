@@ -121,7 +121,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		} catch (error) {
 			const errorMessage = handleApiError(error);
 			setError(errorMessage);
-			throw new Error(errorMessage);
+			// Don't throw error - just set error state
 		} finally {
 			setIsLoading(false);
 		}
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		} catch (error) {
 			const errorMessage = handleApiError(error);
 			setError(errorMessage);
-			throw new Error(errorMessage);
+			// Don't throw error - just set error state
 		} finally {
 			setIsLoading(false);
 		}
