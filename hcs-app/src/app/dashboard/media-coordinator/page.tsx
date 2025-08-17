@@ -1,108 +1,126 @@
 "use client";
 
-import React from "react";
-import { Camera, Video, Newspaper, Calendar } from "lucide-react";
+import { MediaCoordinatorDashboard } from "@/components/media-coordinator/media-coordinator-dashboard";
+
+// Mock data for the media coordinator
+const mockMediaCoordinatorData = {
+	id: "MC001",
+	name: "Sarah Johnson",
+	email: "sarah.johnson@happychildschool.edu",
+	phone: "+1 (555) 123-4567",
+	profilePicture: "/api/placeholder/150/150",
+	employeeId: "EMP-MC-001",
+	department: "Media & Communications",
+	designation: "Media Coordinator",
+	joiningDate: "2023-06-15",
+	permissions: [
+		"upload_media",
+		"manage_gallery",
+		"publish_news",
+		"moderate_comments",
+		"schedule_posts",
+		"archive_content",
+		"view_analytics",
+		"manage_tags",
+	],
+	mediaStats: {
+		totalImages: 1250,
+		totalVideos: 89,
+		activeNews: 23,
+		totalViews: 45678,
+		pendingApprovals: 7,
+		scheduledPosts: 12,
+		totalLikes: 3456,
+		totalShares: 789,
+		monthlyUploads: 156,
+		storageUsed: 85.5,
+		storageLimit: 100,
+	},
+	recentActivities: [
+		{
+			id: 1,
+			type: "upload",
+			description: "uploaded new gallery 'Science Fair 2024'",
+			timestamp: "2 hours ago",
+			contentId: "GAL001",
+			user: "Sarah Johnson",
+		},
+		{
+			id: 2,
+			type: "publish",
+			description: "published news article 'New Library Wing Opening'",
+			timestamp: "4 hours ago",
+			contentId: "NEWS045",
+			user: "Sarah Johnson",
+		},
+		{
+			id: 3,
+			type: "moderate",
+			description: "approved 5 comments on Sports Day gallery",
+			timestamp: "6 hours ago",
+			contentId: "GAL002",
+			user: "Sarah Johnson",
+		},
+		{
+			id: 4,
+			type: "schedule",
+			description: "scheduled announcement for Parent-Teacher Meeting",
+			timestamp: "1 day ago",
+			contentId: "ANN012",
+			user: "Sarah Johnson",
+		},
+		{
+			id: 5,
+			type: "archive",
+			description: "archived old content from 2023",
+			timestamp: "2 days ago",
+			contentId: "BATCH001",
+			user: "Admin System",
+		},
+	],
+	engagementMetrics: {
+		dailyViews: [1200, 1450, 1100, 1650, 1300, 1800, 1550],
+		weeklyUploads: [25, 30, 22, 35, 28, 32, 29],
+		topCategories: [
+			{ name: "Events", count: 145, growth: 12 },
+			{ name: "Academic", count: 98, growth: 8 },
+			{ name: "Sports", count: 76, growth: 15 },
+			{ name: "Infrastructure", count: 45, growth: -3 },
+		],
+		recentComments: [
+			{
+				id: "1",
+				content:
+					"Amazing photos from the science fair! Great quality and coverage.",
+				author: "Parent - John Doe",
+				contentTitle: "Science Fair 2024 Gallery",
+				timestamp: "1 hour ago",
+				status: "approved" as const,
+			},
+			{
+				id: "2",
+				content: "When will the video of the sports day be available?",
+				author: "Parent - Jane Smith",
+				contentTitle: "Annual Sports Day",
+				timestamp: "3 hours ago",
+				status: "pending" as const,
+			},
+			{
+				id: "3",
+				content: "Thank you for sharing these wonderful memories!",
+				author: "Teacher - Mark Wilson",
+				contentTitle: "Graduation Ceremony 2024",
+				timestamp: "5 hours ago",
+				status: "approved" as const,
+			},
+		],
+	},
+};
 
 export default function MediaCoordinatorPage() {
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 text-white">
-				<div className="flex items-center justify-between">
-					<div>
-						<h1 className="text-2xl font-bold mb-2">
-							Media Coordinator Dashboard
-						</h1>
-						<p className="opacity-90">
-							Manage media content, events, and communications
-						</p>
-					</div>
-					<div className="hidden md:flex space-x-4">
-						<div className="text-center">
-							<div className="text-2xl font-bold">156</div>
-							<div className="text-sm opacity-80">Media Items</div>
-						</div>
-						<div className="text-center">
-							<div className="text-2xl font-bold">42</div>
-							<div className="text-sm opacity-80">Events</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{/* Stats Cards */}
-			<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
-					<div className="flex items-center justify-between">
-						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">Photos</p>
-							<p className="text-2xl font-bold text-gray-900 dark:text-white">
-								89
-							</p>
-						</div>
-						<div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
-							<Camera className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-						</div>
-					</div>
-				</div>
-
-				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
-					<div className="flex items-center justify-between">
-						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">Videos</p>
-							<p className="text-2xl font-bold text-purple-600">67</p>
-						</div>
-						<div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
-							<Video className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-						</div>
-					</div>
-				</div>
-
-				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
-					<div className="flex items-center justify-between">
-						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">
-								News Articles
-							</p>
-							<p className="text-2xl font-bold text-green-600">23</p>
-						</div>
-						<div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
-							<Newspaper className="h-6 w-6 text-green-600 dark:text-green-400" />
-						</div>
-					</div>
-				</div>
-
-				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
-					<div className="flex items-center justify-between">
-						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">Events</p>
-							<p className="text-2xl font-bold text-orange-600">42</p>
-						</div>
-						<div className="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg">
-							<Calendar className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{/* Coming Soon Message */}
-			<div className="bg-white dark:bg-gray-800 rounded-xl p-12 shadow-sm border text-center">
-				<div className="max-w-md mx-auto">
-					<div className="bg-purple-100 dark:bg-purple-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-						<Camera className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-					</div>
-					<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-						Media Management Coming Soon
-					</h3>
-					<p className="text-gray-600 dark:text-gray-400 mb-6">
-						We&apos;re building a powerful media management system. This feature
-						will be available once we integrate with our backend services.
-					</p>
-					<div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-lg inline-block">
-						Frontend Ready ✨
-					</div>
-				</div>
-			</div>
-		</div>
+		<MediaCoordinatorDashboard
+			mediaCoordinatorData={mockMediaCoordinatorData}
+		/>
 	);
 }
