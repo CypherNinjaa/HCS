@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-provider-new";
+import { AuthProvider } from "@/context/auth-context";
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -103,7 +104,12 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning className={inter.variable}>
+		<html
+			lang="en"
+			suppressHydrationWarning
+			className={inter.variable}
+			data-scroll-behavior="smooth"
+		>
 			<head>
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
 				<link
@@ -114,9 +120,11 @@ export default function RootLayout({
 			</head>
 			<body className="min-h-screen bg-background font-sans antialiased overflow-x-hidden">
 				<ThemeProvider defaultTheme="system" storageKey="hcs-theme">
-					<div className="relative flex min-h-screen flex-col w-full">
-						<main className="flex-1 w-full">{children}</main>
-					</div>
+					<AuthProvider>
+						<div className="relative flex min-h-screen flex-col w-full">
+							<main className="flex-1 w-full">{children}</main>
+						</div>
+					</AuthProvider>
 				</ThemeProvider>
 			</body>
 		</html>

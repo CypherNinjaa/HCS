@@ -9,7 +9,9 @@ export function StudentManagement() {
 				<div className="flex items-center justify-between">
 					<div>
 						<h1 className="text-2xl font-bold mb-2">Student Management</h1>
-						<p className="opacity-90">Manage students, enrollment, and academic records</p>
+						<p className="opacity-90">
+							Manage students, enrollment, and academic records
+						</p>
 					</div>
 					<div className="hidden md:flex space-x-4">
 						<div className="text-center">
@@ -29,8 +31,12 @@ export function StudentManagement() {
 				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">Total Students</p>
-							<p className="text-2xl font-bold text-gray-900 dark:text-white">1,247</p>
+							<p className="text-gray-600 dark:text-gray-400 text-sm">
+								Total Students
+							</p>
+							<p className="text-2xl font-bold text-gray-900 dark:text-white">
+								1,247
+							</p>
 						</div>
 						<div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
 							<Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -41,7 +47,9 @@ export function StudentManagement() {
 				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">Active Students</p>
+							<p className="text-gray-600 dark:text-gray-400 text-sm">
+								Active Students
+							</p>
 							<p className="text-2xl font-bold text-green-600">1,198</p>
 						</div>
 						<div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
@@ -53,7 +61,9 @@ export function StudentManagement() {
 				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">Inactive</p>
+							<p className="text-gray-600 dark:text-gray-400 text-sm">
+								Inactive
+							</p>
 							<p className="text-2xl font-bold text-orange-600">49</p>
 						</div>
 						<div className="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg">
@@ -65,7 +75,9 @@ export function StudentManagement() {
 				<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-gray-600 dark:text-gray-400 text-sm">Classes</p>
+							<p className="text-gray-600 dark:text-gray-400 text-sm">
+								Classes
+							</p>
 							<p className="text-2xl font-bold text-purple-600">42</p>
 						</div>
 						<div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
@@ -85,7 +97,9 @@ export function StudentManagement() {
 						Student Management Coming Soon
 					</h3>
 					<p className="text-gray-600 dark:text-gray-400 mb-6">
-						We&apos;re building a comprehensive student management system. This feature will be available once we integrate with our backend services.
+						We&apos;re building a comprehensive student management system. This
+						feature will be available once we integrate with our backend
+						services.
 					</p>
 					<div className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-2 rounded-lg inline-block">
 						Frontend Ready ✨
