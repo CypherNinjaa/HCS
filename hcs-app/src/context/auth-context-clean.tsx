@@ -14,7 +14,14 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 interface User {
 	id: string;
 	email: string;
-	role: "admin" | "coordinator" | "teacher" | "student" | "parent" | "librarian" | "media_coordinator";
+	role:
+		| "admin"
+		| "coordinator"
+		| "teacher"
+		| "student"
+		| "parent"
+		| "librarian"
+		| "media_coordinator";
 	status: "active" | "inactive" | "suspended" | "pending_verification";
 	email_verified: boolean;
 	first_name?: string;
@@ -31,7 +38,11 @@ interface AuthContextType {
 	error: string | null;
 
 	// Actions
-	signUp: (email: string, password: string, userData?: Record<string, unknown>) => Promise<void>;
+	signUp: (
+		email: string,
+		password: string,
+		userData?: Record<string, unknown>
+	) => Promise<void>;
 	signIn: (email: string, password: string) => Promise<void>;
 	signOut: () => Promise<void>;
 	clearError: () => void;
@@ -59,10 +70,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		// Get initial session
 		const getInitialSession = async () => {
 			try {
-				const { data: { session }, error } = await supabase.auth.getSession();
-				
+				const {
+					data: { session },
+					error,
+				} = await supabase.auth.getSession();
+
 				if (error) {
-					console.error('Error getting session:', error);
+					console.error("Error getting session:", error);
 					setError(error.message);
 				}
 
@@ -71,8 +85,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 					await loadUserProfile(session.user);
 				}
 			} catch (error) {
-				console.error('Session initialization error:', error);
-				setError('Failed to initialize authentication');
+				console.error("Session initialization error:", error);
+				setError("Failed to initialize authentication");
 			} finally {
 				setIsLoading(false);
 			}
@@ -81,21 +95,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		getInitialSession();
 
 		// Listen for auth changes
-		const { data: { subscription } } = supabase.auth.onAuthStateChange(
-			async (event, session) => {
-				console.log('Auth state changed:', event, session?.user?.email);
-				
-				if (session?.user) {
-					setSupabaseUser(session.user);
-					await loadUserProfile(session.user);
-				} else {
-					setSupabaseUser(null);
-					setUser(null);
-				}
-				
-				setIsLoading(false);
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange(async (event, session) => {
+			console.log("Auth state changed:", event, session?.user?.email);
+
+			if (session?.user) {
+				setSupabaseUser(session.user);
+				await loadUserProfile(session.user);
+			} else {
+				setSupabaseUser(null);
+				setUser(null);
 			}
-		);
+
+			setIsLoading(false);
+		});
 
 		return () => {
 			subscription.unsubscribe();
@@ -108,9 +122,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			// Later, you can fetch additional profile data from your profiles table
 			const userProfile: User = {
 				id: supabaseUser.id,
-				email: supabaseUser.email || '',
-				role: 'student', // Default role - you'll want to fetch this from your database
-				status: 'active',
+				email: supabaseUser.email || "",
+				role: "student", // Default role - you'll want to fetch this from your database
+				status: "active",
 				email_verified: !!supabaseUser.email_confirmed_at,
 				first_name: supabaseUser.user_metadata?.first_name,
 				last_name: supabaseUser.user_metadata?.last_name,
@@ -119,12 +133,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			setUser(userProfile);
 		} catch (error) {
-			console.error('Error loading user profile:', error);
-			setError('Failed to load user profile');
+			console.error("Error loading user profile:", error);
+			setError("Failed to load user profile");
 		}
 	};
 
-	const signUp = async (email: string, password: string, userData?: Record<string, unknown>) => {
+	const signUp = async (
+		email: string,
+		password: string,
+		userData?: Record<string, unknown>
+	) => {
 		try {
 			setIsLoading(true);
 			setError(null);
@@ -133,8 +151,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				email,
 				password,
 				options: {
-					data: userData || {}
-				}
+					data: userData || {},
+				},
 			});
 
 			if (error) {
@@ -143,8 +161,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			// User will be set via the auth state change listener
 		} catch (error: unknown) {
-			console.error('Sign up error:', error);
-			const errorMessage = error instanceof Error ? error.message : 'Failed to sign up';
+			console.error("Sign up error:", error);
+			const errorMessage =
+				error instanceof Error ? error.message : "Failed to sign up";
 			setError(errorMessage);
 			throw error;
 		} finally {
@@ -168,8 +187,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			// User will be set via the auth state change listener
 		} catch (error: unknown) {
-			console.error('Sign in error:', error);
-			const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
+			console.error("Sign in error:", error);
+			const errorMessage =
+				error instanceof Error ? error.message : "Failed to sign in";
 			setError(errorMessage);
 			throw error;
 		} finally {
@@ -190,8 +210,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			// User will be cleared via the auth state change listener
 		} catch (error: unknown) {
-			console.error('Sign out error:', error);
-			const errorMessage = error instanceof Error ? error.message : 'Failed to sign out';
+			console.error("Sign out error:", error);
+			const errorMessage =
+				error instanceof Error ? error.message : "Failed to sign out";
 			setError(errorMessage);
 		} finally {
 			setIsLoading(false);

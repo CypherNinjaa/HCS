@@ -1,11 +1,33 @@
 export const QUALIFICATION_OPTIONS = [
-	{ value: "diploma", label: "Diploma" },
-	{ value: "bachelor", label: "Bachelor's Degree" },
-	{ value: "master", label: "Master's Degree" },
-	{ value: "phd", label: "PhD" },
+	{ value: "B.Ed", label: "Bachelor of Education" },
+	{ value: "M.Ed", label: "Master of Education" },
+	{ value: "B.A", label: "Bachelor of Arts" },
+	{ value: "M.A", label: "Master of Arts" },
+	{ value: "B.Sc", label: "Bachelor of Science" },
+	{ value: "M.Sc", label: "Master of Science" },
+	{ value: "B.Com", label: "Bachelor of Commerce" },
+	{ value: "M.Com", label: "Master of Commerce" },
+	{ value: "B.Tech", label: "Bachelor of Technology" },
+	{ value: "M.Tech", label: "Master of Technology" },
+	{ value: "Ph.D", label: "Doctor of Philosophy" },
+	{ value: "Diploma", label: "Diploma" },
+	{ value: "Other", label: "Other" },
 ] as const;
 
-export type QualificationType = "diploma" | "bachelor" | "master" | "phd";
+export type QualificationType =
+	| "B.Ed"
+	| "M.Ed"
+	| "B.A"
+	| "M.A"
+	| "B.Sc"
+	| "M.Sc"
+	| "B.Com"
+	| "M.Com"
+	| "B.Tech"
+	| "M.Tech"
+	| "Ph.D"
+	| "Diploma"
+	| "Other";
 
 export interface Teacher {
 	id: string;

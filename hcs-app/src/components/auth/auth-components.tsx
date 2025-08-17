@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 import { UserWithProfile } from "@/types/auth";
 
 export function LogoutButton({ className = "" }: { className?: string }) {
-	const { logout, user } = useAuth();
+	const { signOut, user } = useAuth();
 	const router = useRouter();
 
 	const handleLogout = async () => {
 		try {
-			await logout();
+			await signOut();
 			router.push("/login");
 		} catch (error) {
 			console.error("Logout failed:", error);

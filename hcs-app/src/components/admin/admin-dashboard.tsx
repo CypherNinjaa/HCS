@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AdminOverview } from "./dashboard/admin-overview";
 import { LiveAnalytics } from "./dashboard/live-analytics";
 import { StudentManagement } from "./dashboard/student-management";
-import { TeacherManagement } from "./dashboard/teacher-management";
+import { TeacherManagementNew as TeacherManagement } from "./dashboard/teacher-management-new";
 import { ClassManagement } from "./dashboard/class-management";
 import { FeeManagement } from "./dashboard/fee-management";
 import { ExamManagement } from "./dashboard/exam-management";

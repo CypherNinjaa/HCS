@@ -29,13 +29,13 @@ export function AdminHeader({
 	const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-	const { logout, user } = useAuth();
+	const { signOut, user } = useAuth();
 	const router = useRouter();
 
 	const handleLogout = async () => {
 		try {
 			setIsLoggingOut(true);
-			await logout();
+			await signOut();
 			router.push("/login");
 		} catch (error) {
 			console.error("Logout error:", error);

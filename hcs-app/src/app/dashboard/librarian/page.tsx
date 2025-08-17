@@ -1,3 +1,5 @@
+"use client";
+
 import { LibrarianDashboard } from "@/components/librarian/librarian-dashboard";
 import { LibrarianHeader } from "@/components/librarian/librarian-header";
 import { LibrarianSidebar } from "@/components/librarian/librarian-sidebar";
