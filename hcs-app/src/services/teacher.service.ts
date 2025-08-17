@@ -1,359 +1,405 @@
-import { apiClient } from "@/lib/api-client";
-import {
-	Teacher,
-	CreateTeacherRequest,
-	UpdateTeacherRequest,
-	TeacherSearchParams,
-	TeacherListResponse,
-	TeacherResponse,
-	TeacherStatsResponse,
-	BulkUpdateTeachersRequest,
-	BulkUpdateResponse,
-	DepartmentListResponse,
-	SubjectListResponse,
-	TeacherFormData,
-	QualificationType,
-} from "@/types/teacher";
-import { ApiResponse } from "@/types/auth";
+/**
+ * Teacher Service - Supabase Implementation
+ * Handles all teacher-related database operations
+ */
 
-export class TeacherService {
-	private readonly baseEndpoint = "/v1/teachers";
+import { supabase } from "@/lib/supabase";
+import { handleApiError } from "@/lib/error-handler";
+
+export interface Teacher {
+	id: string;
+	user_id: string;
+	first_name: string;
+	last_name: string;
+	middle_name?: string;
+	employee_id?: string;
+	department?: string;
+	designation?: string;
+	subject_specialization?: string[];
+	date_of_birth?: string;
+	gender?: string;
+	phone_number?: string;
+	address?: string;
+	qualification?: string;
+	experience_years?: number;
+	joining_date?: string;
+	status: "active" | "inactive" | "on_leave" | "terminated";
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateTeacherRequest {
+	email: string;
+	password: string;
+	first_name: string;
+	last_name: string;
+	middle_name?: string;
+	employee_id?: string;
+	department?: string;
+	designation?: string;
+	subject_specialization?: string[];
+	date_of_birth?: string;
+	gender?: string;
+	phone_number?: string;
+	address?: string;
+	qualification?: string;
+	experience_years?: number;
+	joining_date?: string;
+}
+
+export interface UpdateTeacherRequest {
+	first_name?: string;
+	last_name?: string;
+	middle_name?: string;
+	employee_id?: string;
+	department?: string;
+	designation?: string;
+	subject_specialization?: string[];
+	date_of_birth?: string;
+	gender?: string;
+	phone_number?: string;
+	address?: string;
+	qualification?: string;
+	experience_years?: number;
+	joining_date?: string;
+	status?: "active" | "inactive" | "on_leave" | "terminated";
+}
+
+export interface TeacherFilters {
+	search?: string;
+	department?: string;
+	designation?: string;
+	status?: string;
+	page?: number;
+	limit?: number;
+}
+
+export interface TeachersResponse {
+	teachers: Teacher[];
+	total: number;
+	page: number;
+	totalPages: number;
+}
+
+class TeacherService {
+	private readonly tableName = "teachers";
 
 	/**
-	 * Get dashboard statistics
+	 * Get all teachers with optional filtering and pagination
 	 */
-	async getDashboardStats(): Promise<TeacherStatsResponse> {
-		return apiClient.authenticatedRequest<TeacherStatsResponse>(
-			`${this.baseEndpoint}/dashboard/stats`
-		);
-	}
+	async getTeachers(filters: TeacherFilters = {}): Promise<TeachersResponse> {
+		try {
+			const {
+				search,
+				department,
+				designation,
+				status = "active",
+				page = 1,
+				limit = 20,
+			} = filters;
 
-	/**
-	 * Get all teachers with pagination and filtering
-	 */
-	async getTeachers(
-		params: TeacherSearchParams = {}
-	): Promise<TeacherListResponse> {
-		const searchParams = new URLSearchParams();
+			let query = supabase.from(this.tableName).select("*", { count: "exact" });
 
-		// Add parameters to search params
-		if (params.page) searchParams.append("page", params.page.toString());
-		if (params.limit) searchParams.append("limit", params.limit.toString());
-		if (params.search) searchParams.append("search", params.search);
-		if (params.department) searchParams.append("department", params.department);
-		if (params.subjects && params.subjects.length > 0)
-			searchParams.append("subjects", params.subjects.join(","));
-		if (params.qualification)
-			searchParams.append("qualification", params.qualification);
-		if (params.experience) searchParams.append("experience", params.experience);
-		if (params.status) searchParams.append("status", params.status);
-		if (params.performanceRating)
-			searchParams.append("performanceRating", params.performanceRating);
+			// Apply filters
+			if (search) {
+				query = query.or(
+					`first_name.ilike.%${search}%,last_name.ilike.%${search}%,employee_id.ilike.%${search}%`
+				);
+			}
 
-		const queryString = searchParams.toString();
-		const endpoint = queryString
-			? `${this.baseEndpoint}?${queryString}`
-			: this.baseEndpoint;
+			if (department) {
+				query = query.eq("department", department);
+			}
 
-		return apiClient.authenticatedRequest<TeacherListResponse>(endpoint);
+			if (designation) {
+				query = query.eq("designation", designation);
+			}
+
+			if (status) {
+				query = query.eq("status", status);
+			}
+
+			// Apply pagination
+			const from = (page - 1) * limit;
+			const to = from + limit - 1;
+			query = query.range(from, to);
+
+			// Order by last name, first name
+			query = query.order("last_name").order("first_name");
+
+			const { data, error, count } = await query;
+
+			if (error) {
+				throw error;
+			}
+
+			return {
+				teachers: data || [],
+				total: count || 0,
+				page,
+				totalPages: Math.ceil((count || 0) / limit),
+			};
+		} catch (error) {
+			console.error("Error fetching teachers:", error);
+			throw new Error(handleApiError(error));
+		}
 	}
 
 	/**
 	 * Get a specific teacher by ID
 	 */
-	async getTeacher(id: string): Promise<TeacherResponse> {
-		return apiClient.authenticatedRequest<TeacherResponse>(
-			`${this.baseEndpoint}/${id}`
-		);
-	}
+	async getTeacherById(id: string): Promise<Teacher | null> {
+		try {
+			const { data, error } = await supabase
+				.from(this.tableName)
+				.select("*")
+				.eq("id", id)
+				.single();
 
-	/**
-	 * Get teacher by teacher ID (TCH0001)
-	 */
-	async getTeacherByTeacherId(teacherId: string): Promise<TeacherResponse> {
-		return apiClient.authenticatedRequest<TeacherResponse>(
-			`${this.baseEndpoint}/teacher-id/${teacherId}`
-		);
-	}
+			if (error) {
+				if (error.code === "PGRST116") {
+					return null; // Teacher not found
+				}
+				throw error;
+			}
 
-	/**
-	 * Get teacher by email
-	 */
-	async getTeacherByEmail(email: string): Promise<TeacherResponse> {
-		return apiClient.authenticatedRequest<TeacherResponse>(
-			`${this.baseEndpoint}/email/${email}`
-		);
-	}
-
-	/**
-	 * Get teachers by department
-	 */
-	async getTeachersByDepartment(
-		department: string
-	): Promise<TeacherListResponse> {
-		return apiClient.authenticatedRequest<TeacherListResponse>(
-			`${this.baseEndpoint}/department/${department}`
-		);
-	}
-
-	/**
-	 * Get teachers by subject
-	 */
-	async getTeachersBySubject(subject: string): Promise<TeacherListResponse> {
-		return apiClient.authenticatedRequest<TeacherListResponse>(
-			`${this.baseEndpoint}/subject/${subject}`
-		);
+			return data;
+		} catch (error) {
+			console.error("Error fetching teacher:", error);
+			throw new Error(handleApiError(error));
+		}
 	}
 
 	/**
 	 * Create a new teacher
 	 */
-	async createTeacher(data: CreateTeacherRequest): Promise<TeacherResponse> {
-		return apiClient.authenticatedRequest<TeacherResponse>(this.baseEndpoint, {
-			method: "POST",
-			body: JSON.stringify(data),
-		});
+	async createTeacher(teacherData: CreateTeacherRequest): Promise<Teacher> {
+		try {
+			// First create user in Supabase Auth
+			const { data: authData, error: authError } =
+				await supabase.auth.admin.createUser({
+					email: teacherData.email,
+					password: teacherData.password,
+					email_confirm: true,
+					user_metadata: {
+						first_name: teacherData.first_name,
+						last_name: teacherData.last_name,
+						role: "teacher",
+					},
+				});
+
+			if (authError) {
+				throw authError;
+			}
+
+			if (!authData.user) {
+				throw new Error("Failed to create user account");
+			}
+
+			// Create teacher profile
+			const { data, error } = await supabase
+				.from(this.tableName)
+				.insert({
+					user_id: authData.user.id,
+					first_name: teacherData.first_name,
+					last_name: teacherData.last_name,
+					middle_name: teacherData.middle_name,
+					employee_id: teacherData.employee_id,
+					department: teacherData.department,
+					designation: teacherData.designation,
+					subject_specialization: teacherData.subject_specialization,
+					date_of_birth: teacherData.date_of_birth,
+					gender: teacherData.gender,
+					phone_number: teacherData.phone_number,
+					address: teacherData.address,
+					qualification: teacherData.qualification,
+					experience_years: teacherData.experience_years,
+					joining_date: teacherData.joining_date,
+					status: "active",
+				})
+				.select()
+				.single();
+
+			if (error) {
+				// If teacher creation fails, clean up the auth user
+				await supabase.auth.admin.deleteUser(authData.user.id);
+				throw error;
+			}
+
+			return data;
+		} catch (error) {
+			console.error("Error creating teacher:", error);
+			throw new Error(handleApiError(error));
+		}
 	}
 
 	/**
-	 * Update an existing teacher
+	 * Update a teacher
 	 */
 	async updateTeacher(
 		id: string,
-		data: UpdateTeacherRequest
-	): Promise<TeacherResponse> {
-		return apiClient.authenticatedRequest<TeacherResponse>(
-			`${this.baseEndpoint}/${id}`,
-			{
-				method: "PUT",
-				body: JSON.stringify(data),
+		updates: UpdateTeacherRequest
+	): Promise<Teacher> {
+		try {
+			const { data, error } = await supabase
+				.from(this.tableName)
+				.update({
+					...updates,
+					updated_at: new Date().toISOString(),
+				})
+				.eq("id", id)
+				.select()
+				.single();
+
+			if (error) {
+				throw error;
 			}
-		);
+
+			return data;
+		} catch (error) {
+			console.error("Error updating teacher:", error);
+			throw new Error(handleApiError(error));
+		}
 	}
 
 	/**
 	 * Delete a teacher (soft delete)
 	 */
-	async deleteTeacher(id: string): Promise<ApiResponse<null>> {
-		return apiClient.authenticatedRequest<ApiResponse<null>>(
-			`${this.baseEndpoint}/${id}`,
-			{
-				method: "DELETE",
+	async deleteTeacher(id: string): Promise<void> {
+		try {
+			const { error } = await supabase
+				.from(this.tableName)
+				.update({
+					status: "inactive",
+					updated_at: new Date().toISOString(),
+				})
+				.eq("id", id);
+
+			if (error) {
+				throw error;
 			}
-		);
+		} catch (error) {
+			console.error("Error deleting teacher:", error);
+			throw new Error(handleApiError(error));
+		}
+	}
+
+	/**
+	 * Get teachers by department
+	 */
+	async getTeachersByDepartment(department: string): Promise<Teacher[]> {
+		try {
+			const { data, error } = await supabase
+				.from(this.tableName)
+				.select("*")
+				.eq("department", department)
+				.eq("status", "active")
+				.order("first_name");
+
+			if (error) {
+				throw error;
+			}
+
+			return data || [];
+		} catch (error) {
+			console.error("Error fetching teachers by department:", error);
+			throw new Error(handleApiError(error));
+		}
+	}
+
+	/**
+	 * Get teachers by subject specialization
+	 */
+	async getTeachersBySubject(subject: string): Promise<Teacher[]> {
+		try {
+			const { data, error } = await supabase
+				.from(this.tableName)
+				.select("*")
+				.contains("subject_specialization", [subject])
+				.eq("status", "active")
+				.order("first_name");
+
+			if (error) {
+				throw error;
+			}
+
+			return data || [];
+		} catch (error) {
+			console.error("Error fetching teachers by subject:", error);
+			throw new Error(handleApiError(error));
+		}
 	}
 
 	/**
 	 * Bulk update teachers
 	 */
 	async bulkUpdateTeachers(
-		data: BulkUpdateTeachersRequest
-	): Promise<BulkUpdateResponse> {
-		return apiClient.authenticatedRequest<BulkUpdateResponse>(
-			`${this.baseEndpoint}/bulk`,
-			{
-				method: "PATCH",
-				body: JSON.stringify(data),
+		updates: Array<{ id: string; updates: UpdateTeacherRequest }>
+	): Promise<Teacher[]> {
+		try {
+			const promises = updates.map(({ id, updates: teacherUpdates }) =>
+				this.updateTeacher(id, teacherUpdates)
+			);
+
+			return Promise.all(promises);
+		} catch (error) {
+			console.error("Error bulk updating teachers:", error);
+			throw new Error(handleApiError(error));
+		}
+	}
+
+	/**
+	 * Get teacher statistics
+	 */
+	async getTeacherStats(): Promise<{
+		total: number;
+		active: number;
+		inactive: number;
+		onLeave: number;
+		byDepartment: Record<string, number>;
+	}> {
+		try {
+			const { data, error } = await supabase
+				.from(this.tableName)
+				.select("status, department");
+
+			if (error) {
+				throw error;
 			}
-		);
-	}
 
-	/**
-	 * Export teachers data
-	 */
-	async exportTeachers(params: TeacherSearchParams = {}): Promise<Blob> {
-		const searchParams = new URLSearchParams();
+			const stats = {
+				total: data?.length || 0,
+				active: 0,
+				inactive: 0,
+				onLeave: 0,
+				byDepartment: {} as Record<string, number>,
+			};
 
-		// Add parameters to search params
-		if (params.search) searchParams.append("search", params.search);
-		if (params.department) searchParams.append("department", params.department);
-		if (params.subjects && params.subjects.length > 0)
-			searchParams.append("subjects", params.subjects.join(","));
-		if (params.qualification)
-			searchParams.append("qualification", params.qualification);
-		if (params.experience) searchParams.append("experience", params.experience);
-		if (params.status) searchParams.append("status", params.status);
-		if (params.performanceRating)
-			searchParams.append("performanceRating", params.performanceRating);
+			data?.forEach((teacher) => {
+				switch (teacher.status) {
+					case "active":
+						stats.active++;
+						break;
+					case "inactive":
+						stats.inactive++;
+						break;
+					case "on_leave":
+						stats.onLeave++;
+						break;
+				}
 
-		const queryString = searchParams.toString();
-		const endpoint = queryString
-			? `${this.baseEndpoint}/export?${queryString}`
-			: `${this.baseEndpoint}/export`;
+				if (teacher.department) {
+					stats.byDepartment[teacher.department] =
+						(stats.byDepartment[teacher.department] || 0) + 1;
+				}
+			});
 
-		const response = await apiClient.authenticatedRequest<Response>(endpoint, {
-			headers: {
-				Accept: "text/csv",
-			},
-		});
-
-		return response.blob();
-	}
-
-	/**
-	 * Get available departments
-	 */
-	async getDepartments(): Promise<DepartmentListResponse> {
-		return apiClient.authenticatedRequest<DepartmentListResponse>(
-			"/v1/departments"
-		);
-	}
-
-	/**
-	 * Get available subjects
-	 */
-	async getSubjects(): Promise<SubjectListResponse> {
-		return apiClient.authenticatedRequest<SubjectListResponse>("/v1/subjects");
+			return stats;
+		} catch (error) {
+			console.error("Error fetching teacher stats:", error);
+			throw new Error(handleApiError(error));
+		}
 	}
 }
 
-// Create singleton instance
 export const teacherService = new TeacherService();
-
-// Helper functions for formatting
-export const formatTeacherName = (teacher: Teacher): string => {
-	return `${teacher.firstName} ${teacher.lastName}`;
-};
-
-export const formatTeacherSubjects = (subjects: string[]): string => {
-	if (subjects.length === 0) return "No subjects assigned";
-	if (subjects.length <= 2) return subjects.join(", ");
-	return `${subjects.slice(0, 2).join(", ")} +${subjects.length - 2} more`;
-};
-
-export const formatTeacherExperience = (experience?: string): string => {
-	if (!experience) return "Not specified";
-	const years = parseInt(experience);
-	if (isNaN(years)) return experience;
-	return years === 1 ? "1 year" : `${years} years`;
-};
-
-export const formatSalary = (salary?: string): string => {
-	if (!salary) return "Not specified";
-	const amount = parseFloat(salary);
-	if (isNaN(amount)) return salary;
-	return new Intl.NumberFormat("en-IN", {
-		style: "currency",
-		currency: "INR",
-		maximumFractionDigits: 0,
-	}).format(amount);
-};
-
-export const formatStatus = (status: string): string => {
-	switch (status) {
-		case "active":
-			return "Active";
-		case "inactive":
-			return "Inactive";
-		case "on_leave":
-			return "On Leave";
-		default:
-			return status;
-	}
-};
-
-export const formatPerformanceRating = (rating?: string): string => {
-	if (!rating) return "Not rated";
-	switch (rating) {
-		case "excellent":
-			return "Excellent";
-		case "good":
-			return "Good";
-		case "average":
-			return "Average";
-		case "needs_improvement":
-			return "Needs Improvement";
-		default:
-			return rating;
-	}
-};
-
-export const getStatusColor = (status: string): string => {
-	switch (status) {
-		case "active":
-			return "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-		case "inactive":
-			return "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-		case "on_leave":
-			return "bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
-		default:
-			return "bg-muted text-muted-foreground";
-	}
-};
-
-export const getPerformanceColor = (rating?: string): string => {
-	if (!rating) return "bg-muted text-muted-foreground";
-	switch (rating) {
-		case "excellent":
-			return "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-		case "good":
-			return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
-		case "average":
-			return "bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
-		case "needs_improvement":
-			return "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-		default:
-			return "bg-muted text-muted-foreground";
-	}
-};
-
-export const getActiveStatusColor = (isActive: boolean): string => {
-	return isActive
-		? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-		: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-};
-
-// Validation helpers
-export const validateTeacherData = (data: CreateTeacherRequest): string[] => {
-	const errors: string[] = [];
-
-	if (!data.firstName?.trim()) errors.push("First name is required");
-	if (!data.lastName?.trim()) errors.push("Last name is required");
-	if (!data.email?.trim()) errors.push("Email is required");
-	if (!data.joiningDate) errors.push("Joining date is required");
-	if (!data.qualification?.trim()) errors.push("Qualification is required");
-	if (!data.department?.trim()) errors.push("Department is required");
-	if (!data.subjects || data.subjects.length === 0)
-		errors.push("At least one subject is required");
-
-	// Email validation
-	if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-		errors.push("Invalid email format");
-	}
-
-	// Experience validation
-	if (data.experience && data.experience < 0) {
-		errors.push("Experience cannot be negative");
-	}
-
-	// Salary validation
-	if (data.salary && data.salary < 0) {
-		errors.push("Salary cannot be negative");
-	}
-
-	return errors;
-};
-
-// Data transformation helpers
-export const transformTeacherForApi = (
-	formData: TeacherFormData
-): CreateTeacherRequest => {
-	return {
-		firstName: formData.firstName?.trim(),
-		lastName: formData.lastName?.trim(),
-		email: formData.email?.trim().toLowerCase(),
-		phone: formData.phone?.trim(),
-		address: formData.address?.trim(),
-		dateOfBirth: formData.dateOfBirth,
-		joiningDate: formData.joiningDate,
-		qualification: formData.qualification?.trim() as QualificationType,
-		experience: formData.experience ? parseInt(formData.experience) : 0,
-		subjects: formData.subjects || [],
-		department: formData.department?.trim(),
-		designation: formData.designation?.trim(),
-		salary: formData.salary ? parseFloat(formData.salary) : undefined,
-		emergencyContact: formData.emergencyContact?.trim(),
-		bloodGroup: formData.bloodGroup,
-		teacherPassword: formData.teacherPassword?.trim(),
-	};
-};

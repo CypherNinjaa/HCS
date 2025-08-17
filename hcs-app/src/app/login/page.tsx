@@ -45,7 +45,7 @@ const roleRedirects: Record<User["role"], string> = {
 
 export default function LoginPage() {
 	const router = useRouter();
-	const { login, isAuthenticated, isLoading, error, clearError, user } =
+	const { signIn, isAuthenticated, isLoading, error, clearError, user } =
 		useAuth();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
@@ -78,7 +78,7 @@ export default function LoginPage() {
 			setIsSubmitting(true);
 			clearError();
 
-			await login(data.email, data.password);
+			await signIn(data.email, data.password);
 
 			// Success - redirect will happen in useEffect above
 			reset();
