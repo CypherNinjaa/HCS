@@ -32,6 +32,15 @@ export const createStudentSchema = z.object({
 	parentName: z.string().optional(),
 	parentPhone: z.string().optional(),
 	parentEmail: z.string().email().optional(),
+	// Add password fields for credential generation
+	studentPassword: z
+		.string()
+		.min(6, "Student password must be at least 6 characters")
+		.optional(),
+	parentPassword: z
+		.string()
+		.min(6, "Parent password must be at least 6 characters")
+		.optional(),
 });
 
 export const updateStudentSchema = z.object({
@@ -90,12 +99,22 @@ export class StudentService {
 		const validatedData = createStudentSchema.parse(data);
 
 		try {
-			// Check if email is already in use
+			// Check if student email is already in use
 			const existingUser = await this.userRepository.findByEmail(
 				validatedData.email
 			);
 			if (existingUser) {
-				throw new Error("Email address is already in use");
+				throw new Error("Student email address is already in use");
+			}
+
+			// Check if parent email is already in use (if provided)
+			if (validatedData.parentEmail) {
+				const existingParentUser = await this.userRepository.findByEmail(
+					validatedData.parentEmail
+				);
+				if (existingParentUser) {
+					throw new Error("Parent email address is already in use");
+				}
 			}
 
 			// Check if roll number is already taken in the class
@@ -112,21 +131,27 @@ export class StudentService {
 				throw new Error("Roll number is already taken in this class");
 			}
 
-			// Generate a temporary password for the student
-			const tempPassword = this.generateTempPassword();
-			const hashedPassword = await bcrypt.hash(tempPassword, 12);
+			// Use provided passwords or generate temporary ones
+			const studentPassword =
+				validatedData.studentPassword || this.generateTempPassword();
+			const parentPassword =
+				validatedData.parentPassword || this.generateTempPassword();
 
-			// Create user account
-			const user = await this.userRepository.create({
+			// Hash passwords
+			const hashedStudentPassword = await bcrypt.hash(studentPassword, 12);
+			const hashedParentPassword = await bcrypt.hash(parentPassword, 12);
+
+			// Create student user account
+			const studentUser = await this.userRepository.create({
 				email: validatedData.email,
-				password_hash: hashedPassword,
+				password_hash: hashedStudentPassword,
 				role: "student",
 				status: "active",
 			});
 
-			// Create user profile
+			// Create student profile
 			await this.profileRepository.create({
-				user_id: user.id,
+				user_id: studentUser.id,
 				first_name: validatedData.firstName,
 				last_name: validatedData.lastName,
 				phone_number: validatedData.phone,
@@ -136,10 +161,31 @@ export class StudentService {
 					: undefined,
 			});
 
+			// Create parent user account if parent data is provided
+			let parentUser = null;
+			if (validatedData.parentEmail && validatedData.parentName) {
+				parentUser = await this.userRepository.create({
+					email: validatedData.parentEmail,
+					password_hash: hashedParentPassword,
+					role: "parent",
+					status: "active",
+				});
+
+				// Create parent profile
+				await this.profileRepository.create({
+					user_id: parentUser.id,
+					first_name:
+						validatedData.parentName.split(" ")[0] || validatedData.parentName,
+					last_name:
+						validatedData.parentName.split(" ").slice(1).join(" ") || "",
+					phone_number: validatedData.parentPhone,
+				});
+			}
+
 			// Create student record
 			const student = await this.studentRepository.create(
 				validatedData,
-				user.id
+				studentUser.id
 			);
 
 			// Log the creation
@@ -151,13 +197,23 @@ export class StudentService {
 				metadata: {
 					studentId: student.studentId,
 					admissionNumber: student.admissionNumber,
-					tempPassword, // Store temp password for admin reference (in production, send via email)
+					studentPassword: validatedData.studentPassword
+						? "provided"
+						: studentPassword, // Store actual password only if not provided (temporary)
+					parentPassword: validatedData.parentPassword
+						? "provided"
+						: parentPassword, // Store actual password only if not provided (temporary)
+					parentUserId: parentUser?.id,
 				},
 			});
 
 			logger.info(
-				{ studentId: student.id, studentNumber: student.studentId },
-				"Student created successfully"
+				{
+					studentId: student.id,
+					studentNumber: student.studentId,
+					parentUserId: parentUser?.id,
+				},
+				"Student and parent accounts created successfully"
 			);
 
 			return student;

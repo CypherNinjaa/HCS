@@ -17,6 +17,9 @@ export interface CreateStudentData {
 	parentName?: string;
 	parentPhone?: string;
 	parentEmail?: string;
+	// Add credential fields
+	studentPassword?: string;
+	parentPassword?: string;
 }
 
 export interface UpdateStudentData {

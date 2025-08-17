@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { User } from "@/types/auth";
@@ -21,6 +21,13 @@ export function ProtectedRoute({
 	const { isAuthenticated, isLoading, user, hasRole, hasAnyRole } = useAuth();
 	const router = useRouter();
 
+	// Handle navigation in useEffect to avoid state updates during render
+	useEffect(() => {
+		if (!isLoading && !isAuthenticated) {
+			router.push(fallbackPath);
+		}
+	}, [isAuthenticated, isLoading, router, fallbackPath]);
+
 	// Show loading state while checking authentication
 	if (isLoading) {
 		return (
@@ -33,9 +40,8 @@ export function ProtectedRoute({
 		);
 	}
 
-	// Redirect to login if not authenticated
+	// Show loading state while redirecting if not authenticated
 	if (!isAuthenticated) {
-		router.push(fallbackPath);
 		return (
 			<div className="min-h-screen flex items-center justify-center bg-gray-50">
 				<div className="text-center">
