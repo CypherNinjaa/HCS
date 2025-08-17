@@ -14,10 +14,10 @@ export function FeeManagement() {
 		<div className="space-y-6">
 			<div className="flex justify-between items-center">
 				<div>
-					<h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
+					<h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
 						Fee Management
 					</h1>
-					<p className="text-muted-foreground">
+					<p className="text-gray-600 dark:text-gray-400">
 						Track fee collection, payments, and financial records
 					</p>
 				</div>
@@ -61,7 +61,7 @@ export function FeeManagement() {
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: index * 0.1 }}
-							className="bg-card rounded-xl p-6 border border-border"
+							className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
 						>
 							<div className="flex items-center gap-4">
 								<div
@@ -70,10 +70,10 @@ export function FeeManagement() {
 									<Icon className="h-6 w-6" />
 								</div>
 								<div>
-									<p className="text-2xl font-bold text-foreground">
+									<p className="text-2xl font-bold text-gray-900 dark:text-white">
 										{stat.value}
 									</p>
-									<p className="text-sm text-muted-foreground">
+									<p className="text-sm text-gray-600 dark:text-gray-400">
 										{stat.title}
 									</p>
 								</div>
@@ -87,17 +87,17 @@ export function FeeManagement() {
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.4 }}
-				className="bg-card rounded-xl p-6 border border-border"
+				className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
 			>
-				<h2 className="text-lg font-semibold text-foreground mb-4">
+				<h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
 					Fee Collection Features
 				</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div>
-						<h3 className="font-medium text-foreground mb-2">
+						<h3 className="font-medium text-gray-900 dark:text-white mb-2">
 							Current Implementation
 						</h3>
-						<ul className="space-y-2 text-sm text-muted-foreground">
+						<ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
 							<li>✅ Cash payment recording</li>
 							<li>✅ Fee status tracking</li>
 							<li>✅ Payment history</li>
@@ -106,10 +106,10 @@ export function FeeManagement() {
 						</ul>
 					</div>
 					<div>
-						<h3 className="font-medium text-foreground mb-2">
+						<h3 className="font-medium text-gray-900 dark:text-white mb-2">
 							Coming Soon
 						</h3>
-						<ul className="space-y-2 text-sm text-muted-foreground">
+						<ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
 							<li>🔄 UPI payment integration</li>
 							<li>🔄 Credit/Debit card payments</li>
 							<li>🔄 Net banking support</li>

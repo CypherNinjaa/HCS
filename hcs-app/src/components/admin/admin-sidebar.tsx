@@ -178,7 +178,7 @@ export function AdminSidebar({
 
 			{/* Sidebar */}
 			<aside
-				className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-card border-r border-border z-40 overflow-y-auto transition-transform duration-300 scrollbar-thin ${
+				className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-40 overflow-y-auto transition-transform duration-300 scrollbar-thin ${
 					isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
 				}`}
 			>
@@ -186,9 +186,9 @@ export function AdminSidebar({
 				<div className="lg:hidden flex justify-end p-4">
 					<button
 						onClick={() => setIsOpen(false)}
-						className="p-2 rounded-lg hover:bg-muted transition-colors"
+						className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
 					>
-						<X className="h-5 w-5 text-muted-foreground" />
+						<X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
 					</button>
 				</div>
 
@@ -198,10 +198,10 @@ export function AdminSidebar({
 						<div className="w-16 h-16 mx-auto bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-3">
 							<Shield className="h-8 w-8 text-white" />
 						</div>
-						<h3 className="font-bold text-foreground text-sm">
+						<h3 className="font-bold text-gray-900 dark:text-white text-sm">
 							Super Administrator
 						</h3>
-						<p className="text-xs text-muted-foreground mt-1">
+						<p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
 							Full system access & control
 						</p>
 						<div className="mt-3 flex items-center justify-center gap-2">
@@ -228,33 +228,37 @@ export function AdminSidebar({
 								className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all duration-200 group ${
 									isActive
 										? `bg-gradient-to-r ${item.color} text-white shadow-lg shadow-purple-500/25`
-										: "text-foreground hover:bg-muted"
+										: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
 								}`}
 							>
 								<div
 									className={`p-1.5 rounded-lg transition-colors ${
 										isActive
 											? "bg-white/20"
-											: "bg-muted group-hover:bg-muted/80"
+											: "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
 									}`}
 								>
 									<Icon
 										className={`h-4 w-4 ${
-											isActive ? "text-white" : "text-muted-foreground"
+											isActive
+												? "text-white"
+												: "text-gray-600 dark:text-gray-400"
 										}`}
 									/>
 								</div>
 								<div className="flex-1 min-w-0">
 									<div
 										className={`font-medium text-sm ${
-											isActive ? "text-white" : "text-foreground"
+											isActive ? "text-white" : "text-gray-900 dark:text-white"
 										}`}
 									>
 										{item.label}
 									</div>
 									<div
 										className={`text-xs ${
-											isActive ? "text-white/80" : "text-muted-foreground"
+											isActive
+												? "text-white/80"
+												: "text-gray-500 dark:text-gray-400"
 										} truncate`}
 									>
 										{item.description}
@@ -266,14 +270,14 @@ export function AdminSidebar({
 				</nav>
 
 				{/* System Status Card */}
-				<div className="mx-4 mt-6 p-3 bg-muted/50 rounded-lg border border-border">
-					<h4 className="font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
+				<div className="mx-4 mt-6 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+					<h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-3 flex items-center gap-2">
 						<Database className="h-4 w-4" />
 						System Status
 					</h4>
 					<div className="space-y-2 text-xs">
 						<div className="flex justify-between items-center">
-							<span className="text-muted-foreground">Database</span>
+							<span className="text-gray-600 dark:text-gray-400">Database</span>
 							<div className="flex items-center gap-1">
 								<div className="w-2 h-2 bg-green-500 rounded-full"></div>
 								<span className="font-medium text-green-600 dark:text-green-400">
@@ -282,7 +286,9 @@ export function AdminSidebar({
 							</div>
 						</div>
 						<div className="flex justify-between items-center">
-							<span className="text-muted-foreground">API Status</span>
+							<span className="text-gray-600 dark:text-gray-400">
+								API Status
+							</span>
 							<div className="flex items-center gap-1">
 								<div className="w-2 h-2 bg-green-500 rounded-full"></div>
 								<span className="font-medium text-green-600 dark:text-green-400">
@@ -291,11 +297,15 @@ export function AdminSidebar({
 							</div>
 						</div>
 						<div className="flex justify-between items-center">
-							<span className="text-muted-foreground">Storage</span>
-							<span className="font-medium text-foreground">78%</span>
+							<span className="text-gray-600 dark:text-gray-400">Storage</span>
+							<span className="font-medium text-gray-900 dark:text-white">
+								78%
+							</span>
 						</div>
 						<div className="flex justify-between items-center">
-							<span className="text-muted-foreground">Users Online</span>
+							<span className="text-gray-600 dark:text-gray-400">
+								Users Online
+							</span>
 							<span className="font-medium text-blue-600 dark:text-blue-400">
 								234
 							</span>
@@ -305,7 +315,7 @@ export function AdminSidebar({
 
 				{/* Quick Actions */}
 				<div className="mx-4 mt-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-					<h4 className="font-semibold text-foreground text-sm mb-3">
+					<h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-3">
 						Quick Actions
 					</h4>
 					<div className="space-y-2">

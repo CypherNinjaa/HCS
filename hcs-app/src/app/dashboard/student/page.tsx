@@ -16,9 +16,6 @@ import { LeaveRequests } from "@/components/student/leave-requests";
 import { MCQTests } from "@/components/student/mcq-tests";
 import { Achievements } from "@/components/student/achievements";
 import LearningPaths from "@/components/student/learning-paths";
-import { StudentRoute } from "@/components/auth/protected-route";
-import { useAuth } from "@/context/auth-context";
-import { UserWithProfile } from "@/types/auth";
 
 type ActiveSection =
 	| "dashboard"
@@ -39,22 +36,17 @@ export default function StudentPortal() {
 	const [activeSection, setActiveSection] =
 		useState<ActiveSection>("dashboard");
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const { user } = useAuth();
 
-	// Convert user data to expected format
-	const userWithProfile = user as UserWithProfile;
+	// Mock user data - replace with actual authentication
 	const studentData = {
-		id: user?.id || "STU001",
-		name: userWithProfile?.profile
-			? `${userWithProfile.profile.first_name} ${userWithProfile.profile.last_name}`.trim()
-			: user?.email.split("@")[0] || "Student",
-		class: "Class 10-A", // This would come from student profile/enrollment data
-		rollNumber: "2024001", // This would come from student profile data
-		profileImage:
-			userWithProfile?.profile?.avatar_url || "/default-profile.png",
-		totalPoints: 2450, // This would come from student achievement data
-		level: "Gold Scholar", // This would come from student achievement data
-		attendance: 94.5, // This would come from attendance calculation
+		id: "STU001",
+		name: "Alex Johnson",
+		class: "Class 10-A",
+		rollNumber: "2024001",
+		profileImage: "/placeholder-avatar.jpg",
+		totalPoints: 2450,
+		level: "Gold Scholar",
+		attendance: 94.5,
 	};
 
 	const renderActiveSection = () => {
@@ -100,29 +92,27 @@ export default function StudentPortal() {
 	};
 
 	return (
-		<StudentRoute>
-			<div className="min-h-screen bg-background overflow-hidden w-full">
-				<StudentHeader
-					studentData={studentData}
+		<div className="min-h-screen bg-background overflow-hidden w-full">
+			<StudentHeader
+				studentData={studentData}
+				sidebarOpen={sidebarOpen}
+				setSidebarOpen={setSidebarOpen}
+			/>
+
+			<div className="flex h-[calc(100vh-4rem)] w-full">
+				<StudentSidebar
+					activeSection={activeSection}
+					setActiveSection={setActiveSection}
 					sidebarOpen={sidebarOpen}
 					setSidebarOpen={setSidebarOpen}
 				/>
 
-				<div className="flex h-[calc(100vh-4rem)] w-full">
-					<StudentSidebar
-						activeSection={activeSection}
-						setActiveSection={setActiveSection}
-						sidebarOpen={sidebarOpen}
-						setSidebarOpen={setSidebarOpen}
-					/>
-
-					<main className="flex-1 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent w-full">
-						<div className="p-4 md:p-6 lg:p-8 pt-10 md:pt-10 lg:pt-24 pb-6 md:pb-8 lg:pb-10 w-full max-w-none">
-							{renderActiveSection()}
-						</div>
-					</main>
-				</div>
+				<main className="flex-1 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent w-full">
+					<div className="p-4 md:p-6 lg:p-8 pt-10 md:pt-10 lg:pt-24 pb-6 md:pb-8 lg:pb-10 w-full max-w-none">
+						{renderActiveSection()}
+					</div>
+				</main>
 			</div>
-		</StudentRoute>
+		</div>
 	);
 }

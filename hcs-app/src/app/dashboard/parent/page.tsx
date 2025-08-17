@@ -13,9 +13,6 @@ import { FeePayment } from "@/components/parent/fee-payment";
 import { CircularDownloads } from "@/components/parent/circular-downloads";
 import { LeaveApplications } from "@/components/parent/leave-applications";
 import { EventRating } from "@/components/parent/event-rating";
-import { ParentRoute } from "@/components/auth/protected-route";
-import { useAuth } from "@/context/auth-context";
-import { UserWithProfile } from "@/types/auth";
 
 interface ParentData {
 	name: string;
@@ -37,28 +34,30 @@ export default function ParentPortal() {
 	const [activeSection, setActiveSection] = useState<string>("dashboard");
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [selectedChild, setSelectedChild] = useState<string>("child-1");
-	const { user } = useAuth();
 
-	// Convert user data to expected format
-	const userWithProfile = user as UserWithProfile;
+	// Sample parent data
 	const parentData: ParentData = {
-		name: userWithProfile?.profile
-			? `${userWithProfile.profile.first_name} ${userWithProfile.profile.last_name}`.trim()
-			: user?.email.split("@")[0] || "Parent",
-		relation: "Parent", // This would come from parent profile data
-		email: user?.email || "parent@hcs.edu",
-		phone: userWithProfile?.profile?.phone_number || "+91 98765 43210",
-		profilePicture:
-			userWithProfile?.profile?.avatar_url || "/default-profile.png",
+		name: "Priya Sharma",
+		relation: "Mother",
+		email: "priya.sharma@email.com",
+		phone: "+91 98765 43210",
+		profilePicture: "/api/placeholder/150/150",
 		children: [
-			// This would come from parent-child relationship data
 			{
 				id: "child-1",
-				name: "Child Name",
+				name: "Arjun Sharma",
 				class: "Class 10-A",
 				rollNumber: "23001",
-				profilePicture: "/default-profile.png",
+				profilePicture: "/api/placeholder/100/100",
 				section: "A",
+			},
+			{
+				id: "child-2",
+				name: "Ananya Sharma",
+				class: "Class 7-B",
+				rollNumber: "23155",
+				profilePicture: "/api/placeholder/100/100",
+				section: "B",
 			},
 		],
 	};
@@ -92,38 +91,36 @@ export default function ParentPortal() {
 	};
 
 	return (
-		<ParentRoute>
-			<div className="min-h-screen bg-background overflow-hidden w-full">
-				<ParentHeader
-					parentData={parentData}
+		<div className="min-h-screen bg-background overflow-hidden w-full">
+			<ParentHeader
+				parentData={parentData}
+				sidebarOpen={sidebarOpen}
+				setSidebarOpen={setSidebarOpen}
+				selectedChild={selectedChild}
+				setSelectedChild={setSelectedChild}
+			/>
+
+			<div className="flex h-[calc(100vh-4rem)] w-full">
+				<ParentSidebar
+					activeSection={activeSection}
+					setActiveSection={setActiveSection}
 					sidebarOpen={sidebarOpen}
 					setSidebarOpen={setSidebarOpen}
-					selectedChild={selectedChild}
-					setSelectedChild={setSelectedChild}
 				/>
 
-				<div className="flex h-[calc(100vh-4rem)] w-full">
-					<ParentSidebar
-						activeSection={activeSection}
-						setActiveSection={setActiveSection}
-						sidebarOpen={sidebarOpen}
-						setSidebarOpen={setSidebarOpen}
-					/>
-
-					<main className="flex-1 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent w-full">
-						<div className="p-4 md:p-6 lg:p-8 pt-8 md:pt-10 lg:pt-12 pb-6 md:pb-8 lg:pb-10 w-full max-w-none">
-							<motion.div
-								key={activeSection}
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.3 }}
-							>
-								{renderActiveSection()}
-							</motion.div>
-						</div>
-					</main>
-				</div>
+				<main className="flex-1 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent w-full">
+					<div className="p-4 md:p-6 lg:p-8 pt-8 md:pt-10 lg:pt-12 pb-6 md:pb-8 lg:pb-10 w-full max-w-none">
+						<motion.div
+							key={activeSection}
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3 }}
+						>
+							{renderActiveSection()}
+						</motion.div>
+					</div>
+				</main>
 			</div>
-		</ParentRoute>
+		</div>
 	);
 }
