@@ -1,6 +1,8 @@
-# Happy Child School — Backend Roadmap (Express + PostgreSQL)
+# Happy Child School — Backend Roadmap (Role-Based Development)
 
-## 🚀 Backend Direction (Clean & Simple)
+## 🎯 **Development Strategy: Role by Role (Complete User Journeys)**
+
+Instead of building features phase by phase, we'll develop **complete user roles** one at a time. This ensures each stakeholder gets a fully functional experience and provides immediate business value.
 
 **Frontend**: Next.js (already in `hcs-app/`, TypeScript, App Router)  
 **Backend**: New service `hcs-backend/` using Express + TypeScript  
@@ -12,288 +14,81 @@
 **Testing**: Jest + Supertest (unit + integration tests)  
 **Deployment**: Local dev with `npm run dev` → Future: Render/Railway/Supabase
 
-## Why This Stack is Perfect:
+## Why This Stack & Approach is Perfect:
 
 ✅ **No Docker complexity** - Local PostgreSQL install  
 ✅ **No ORM overhead** - Direct SQL with `pg` driver  
 ✅ **Seamless Supabase migration** - Same PostgreSQL engine  
 ✅ **Better performance** - Raw SQL queries, full control  
 ✅ **Lighter dependencies** - Minimal, focused tech stack  
-✅ **Future-proof** - Native PostgreSQL features available
+✅ **Future-proof** - Native PostgreSQL features available  
+✅ **Complete user journeys** - Each role fully functional before next  
+✅ **Immediate value delivery** - Stakeholders can use system incrementally  
+✅ **Better testing** - Complete role workflows can be validated
 
 ---
 
-## Phase 0: Bootstrap Express Backend (Day 1)
+## 🏗️ **Development Levels Overview**
+
+### **Foundation Level: Core System** (Week 1)
+
+- ✅ Authentication & JWT system
+- ✅ Database schema & connections
+- ✅ Security middleware & RBAC
+- ✅ Basic API infrastructure
+
+### **Level 1: Admin Panel** (Weeks 2-3) 🔥 **CURRENT FOCUS**
+
+Complete admin workflow for school management foundation
+
+### **Level 2: Teacher Panel** (Weeks 4-5)
+
+Complete teacher workflow for classroom management
+
+### **Level 3: Student Panel** (Weeks 6-7)
+
+Complete student workflow for learning engagement
+
+### **Level 4: Parent Panel** (Weeks 8-9)
+
+Complete parent workflow for child monitoring
+
+### **Level 5: Specialized Roles** (Weeks 10-11)
+
+Librarian, Coordinator, Media roles
+
+---
+
+## Foundation Level: Bootstrap Express Backend ✅ **COMPLETED**
 
 **Goal**: Run Express server with TypeScript, PostgreSQL connection, health route
 
-### 0.1 Create `hcs-backend` and install dependencies
+### Core Setup Completed
 
-```bash
-mkdir hcs-backend && cd hcs-backend
-npm init -y
-
-# Core dependencies
-npm install express pg bcryptjs jsonwebtoken cookie-parser zod
-npm install helmet cors express-rate-limit pino pino-pretty dotenv
-npm install @types/express @types/pg @types/bcryptjs @types/jsonwebtoken
-npm install @types/cookie-parser typescript ts-node nodemon --save-dev
-
-# Testing dependencies
-npm install jest supertest @types/jest @types/supertest --save-dev
-```
-
-### 0.2 Project structure & TypeScript setup
-
-```
-hcs-backend/
-├── src/
-│   ├── config/
-│   │   ├── env.ts          # Environment validation
-│   │   └── database.ts     # PostgreSQL connection
-│   ├── middleware/
-│   │   ├── auth.ts         # JWT auth middleware
-│   │   ├── rbac.ts         # Role-based access control
-│   │   ├── rateLimit.ts    # Rate limiting
-│   │   └── error.ts        # Error handling
-│   ├── routes/
-│   │   ├── index.ts        # Route aggregation
-│   │   ├── health.ts       # Health check
-│   │   └── auth.ts         # Auth endpoints
-│   ├── services/
-│   │   ├── authService.ts  # Auth business logic
-│   │   └── userService.ts  # User operations
-│   ├── utils/
-│   │   ├── logger.ts       # Pino logger setup
-│   │   ├── crypto.ts       # Hashing utilities
-│   │   └── validation.ts   # Zod schemas
-│   ├── app.ts              # Express app setup
-│   └── server.ts           # Server startup
-├── tests/
-├── .env.example
-├── tsconfig.json
-└── package.json
-```
-
-### 0.3 Environment & database setup
-
-```bash
-# Install PostgreSQL locally (Ubuntu/Debian)
-sudo apt update && sudo apt install postgresql postgresql-contrib
-
-# Create database and user
-sudo -u postgres psql
-CREATE DATABASE hcs_db;
-CREATE USER hcs_user WITH PASSWORD 'hcs_password';
-GRANT ALL PRIVILEGES ON DATABASE hcs_db TO hcs_user;
-\q
-```
-
-### ✅ Checkpoint: Health route working
-
-`npm run dev` → `http://localhost:4000/health` → `{ status: 'ok' }`
+- ✅ Express + TypeScript setup
+- ✅ PostgreSQL connection
+- ✅ JWT authentication system
+- ✅ Security middleware
+- ✅ Basic RBAC implementation
+- ✅ Health check endpoint
 
 ---
 
-## Phase 1: Database Schema & Raw SQL (2-3 days)
+## Level 1: Admin Panel Development 🔥 **CURRENT LEVEL**
 
-**Goal**: Create tables with raw SQL, database connection, basic user operations
+**Goal**: Complete admin panel with full school management capabilities
 
-### 1.1 Database schema creation
+### Current Status:
+
+- ✅ **Frontend Authentication** - Complete integration with backend
+- ✅ **Frontend Theme Issues** - Fixed hardcoded dark styles
+- ⏳ **Backend APIs** - Ready to implement
+
+
+### L1.1: Core Admin Database Schema (Day 2)
 
 ```sql
--- Create tables with proper constraints
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Users table (core authentication)
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL DEFAULT 'STUDENT',
-    is_active BOOLEAN DEFAULT true,
-    last_login_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL
-);
-
--- Profiles table (user details)
-CREATE TABLE profiles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20),
-    address TEXT,
-    date_of_birth DATE,
-    avatar_url VARCHAR(500),
-    emergency_contact VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Audit logs (security tracking)
-CREATE TABLE audit_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    actor_id UUID REFERENCES users(id),
-    action VARCHAR(100) NOT NULL,
-    entity VARCHAR(100) NOT NULL,
-    entity_id UUID,
-    metadata JSONB,
-    ip_address INET,
-    user_agent TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Indexes for performance
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_profiles_user_id ON profiles(user_id);
-CREATE INDEX idx_audit_logs_actor_id ON audit_logs(actor_id);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
-```
-
-### 1.2 Database service implementation
-
-```typescript
-// src/config/database.ts
-import { Pool } from "pg";
-import { env } from "./env";
-
-export const pool = new Pool({
-	connectionString: env.DATABASE_URL,
-	max: 20,
-	idleTimeoutMillis: 30000,
-	connectionTimeoutMillis: 2000,
-});
-
-// Test connection
-pool.on("connect", () => {
-	console.log("Connected to PostgreSQL database");
-});
-
-pool.on("error", (err) => {
-	console.error("PostgreSQL pool error:", err);
-	process.exit(-1);
-});
-```
-
-### ✅ Checkpoint: Database operations working
-
-- Tables created successfully
-- Connection pool functioning
-- Basic CRUD operations with raw SQL
-
----
-
-## Phase 2: Authentication & JWT (3-4 days)
-
-**Goal**: Complete auth system with JWT cookies, RBAC, security middleware
-
-### 2.1 Auth service with raw SQL
-
-```typescript
-// src/services/authService.ts
-import { pool } from "../config/database";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-
-export class AuthService {
-	async register(userData: RegisterData) {
-		const client = await pool.connect();
-		try {
-			await client.query("BEGIN");
-
-			// Check if user exists
-			const existingUser = await client.query(
-				"SELECT id FROM users WHERE email = $1",
-				[userData.email]
-			);
-
-			if (existingUser.rows.length > 0) {
-				throw new Error("User already exists");
-			}
-
-			// Hash password
-			const passwordHash = await bcrypt.hash(userData.password, 12);
-
-			// Create user
-			const userResult = await client.query(
-				`INSERT INTO users (email, password_hash, role) 
-         VALUES ($1, $2, $3) RETURNING id, email, role`,
-				[userData.email, passwordHash, userData.role || "STUDENT"]
-			);
-
-			// Create profile
-			await client.query(
-				`INSERT INTO profiles (user_id, first_name, last_name) 
-         VALUES ($1, $2, $3)`,
-				[userResult.rows[0].id, userData.firstName, userData.lastName]
-			);
-
-			await client.query("COMMIT");
-			return userResult.rows[0];
-		} catch (error) {
-			await client.query("ROLLBACK");
-			throw error;
-		} finally {
-			client.release();
-		}
-	}
-
-	async login(email: string, password: string) {
-		const result = await pool.query(
-			"SELECT id, email, password_hash, role FROM users WHERE email = $1 AND is_active = true",
-			[email]
-		);
-
-		if (result.rows.length === 0) {
-			throw new Error("Invalid credentials");
-		}
-
-		const user = result.rows[0];
-		const isValid = await bcrypt.compare(password, user.password_hash);
-
-		if (!isValid) {
-			throw new Error("Invalid credentials");
-		}
-
-		// Update last login
-		await pool.query(
-			"UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1",
-			[user.id]
-		);
-
-		// Generate JWT
-		const token = jwt.sign(
-			{ userId: user.id, email: user.email, role: user.role },
-			process.env.JWT_SECRET!,
-			{ expiresIn: "7d" }
-		);
-
-		return { user: { id: user.id, email: user.email, role: user.role }, token };
-	}
-}
-```
-
-### ✅ Checkpoint: Auth system working
-
-- Register/login with PostgreSQL
-- JWT tokens with httpOnly cookies
-- RBAC middleware protecting routes
-- Rate limiting and security headers
-
----
-
-## Phase 3: Core CRUD Operations (1 week)
-
-**Goal**: Users, Profiles, Academic Year, Class, Subject with pagination
-
-### 3.1 Academic schema
-
-```sql
--- Academic years
+-- Academic Years Management
 CREATE TABLE academic_years (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     year VARCHAR(20) UNIQUE NOT NULL,
@@ -304,7 +99,7 @@ CREATE TABLE academic_years (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Classes
+-- Classes (Grades & Sections)
 CREATE TABLE classes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
@@ -312,6 +107,7 @@ CREATE TABLE classes (
     section VARCHAR(10) NOT NULL,
     capacity INTEGER DEFAULT 30,
     academic_year_id UUID NOT NULL REFERENCES academic_years(id),
+    class_teacher_id UUID REFERENCES users(id),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -331,29 +127,18 @@ CREATE TABLE subjects (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(code, class_id)
 );
-```
 
-### ✅ Checkpoint: Academic structure working
-
-- CRUD operations for all entities
-- Proper pagination and filtering
-- Frontend can create/list academic data
-
----
-
-## Phase 4: Role-Specific Tables (1 week)
-
-**Goal**: Students, Teachers, Parents with relationships
-
-```sql
 -- Students
 CREATE TABLE students (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     student_id VARCHAR(20) UNIQUE NOT NULL,
+    admission_number VARCHAR(50) UNIQUE NOT NULL,
     class_id UUID NOT NULL REFERENCES classes(id),
     roll_number VARCHAR(20) NOT NULL,
     admission_date DATE NOT NULL,
+    blood_group VARCHAR(5),
+    medical_conditions TEXT,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -365,13 +150,27 @@ CREATE TABLE teachers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     teacher_id VARCHAR(20) UNIQUE NOT NULL,
+    employee_id VARCHAR(50) UNIQUE NOT NULL,
     qualification TEXT,
     experience INTEGER DEFAULT 0,
     joining_date DATE NOT NULL,
     salary DECIMAL(10,2),
+    department VARCHAR(100),
+    specialization TEXT,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Teacher-Subject Assignments
+CREATE TABLE teacher_subjects (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    teacher_id UUID NOT NULL REFERENCES teachers(id) ON DELETE CASCADE,
+    subject_id UUID NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+    academic_year_id UUID NOT NULL REFERENCES academic_years(id),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(teacher_id, subject_id, academic_year_id)
 );
 
 -- Parents
@@ -381,37 +180,321 @@ CREATE TABLE parents (
     parent_id VARCHAR(20) UNIQUE NOT NULL,
     occupation VARCHAR(100),
     relationship_type VARCHAR(20) NOT NULL,
+    annual_income DECIMAL(10,2),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Parent-Student relationships
+-- Parent-Student Relationships
 CREATE TABLE parent_students (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     parent_id UUID NOT NULL REFERENCES parents(id) ON DELETE CASCADE,
     student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
     relationship_type VARCHAR(20) NOT NULL,
     is_primary BOOLEAN DEFAULT false,
+    is_emergency_contact BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(parent_id, student_id)
 );
 ```
 
-### ✅ Checkpoint: Role relationships working
+### L1.3: Admin API Development (Days 3-5)
 
-- Parent-child linking functional
-- Role-based data access enforced
-- Permission checks working correctly
+**Student Management APIs**:
+
+```
+POST   /api/admin/students              # Create student
+GET    /api/admin/students              # List with pagination/filters
+GET    /api/admin/students/:id          # Get student details
+PUT    /api/admin/students/:id          # Update student
+DELETE /api/admin/students/:id          # Soft delete student
+POST   /api/admin/students/bulk         # Bulk operations
+GET    /api/admin/students/export       # Export student data
+```
+
+**Teacher Management APIs**:
+
+```
+POST   /api/admin/teachers              # Create teacher
+GET    /api/admin/teachers              # List with pagination/filters
+GET    /api/admin/teachers/:id          # Get teacher details
+PUT    /api/admin/teachers/:id          # Update teacher
+DELETE /api/admin/teachers/:id          # Soft delete teacher
+POST   /api/admin/teachers/assign       # Assign subjects
+```
+
+**Class Management APIs**:
+
+```
+POST   /api/admin/classes               # Create class
+GET    /api/admin/classes               # List classes
+PUT    /api/admin/classes/:id           # Update class
+POST   /api/admin/classes/:id/students  # Assign students to class
+POST   /api/admin/classes/:id/teacher   # Assign class teacher
+```
+
+**Academic Year Management**:
+
+```
+POST   /api/admin/academic-years        # Create academic year
+GET    /api/admin/academic-years        # List academic years
+PUT    /api/admin/academic-years/:id    # Update academic year
+PUT    /api/admin/academic-years/:id/activate # Set as active year
+```
+
+### L1.4: Fee Management System (Days 6-7)
+
+```sql
+-- Fee Categories
+CREATE TABLE fee_categories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    is_mandatory BOOLEAN DEFAULT true,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Fee Structures
+CREATE TABLE fee_structures (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    class_id UUID NOT NULL REFERENCES classes(id),
+    fee_category_id UUID NOT NULL REFERENCES fee_categories(id),
+    amount DECIMAL(10,2) NOT NULL,
+    due_date DATE,
+    academic_year_id UUID NOT NULL REFERENCES academic_years(id),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(class_id, fee_category_id, academic_year_id)
+);
+
+-- Fee Payments
+CREATE TABLE fee_payments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID NOT NULL REFERENCES students(id),
+    fee_structure_id UUID NOT NULL REFERENCES fee_structures(id),
+    amount_paid DECIMAL(10,2) NOT NULL,
+    payment_date DATE NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(100),
+    receipt_number VARCHAR(50) UNIQUE NOT NULL,
+    notes TEXT,
+    created_by UUID NOT NULL REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Fee Management APIs**:
+
+```
+POST   /api/admin/fees/categories       # Create fee category
+POST   /api/admin/fees/structures       # Create fee structure
+GET    /api/admin/fees/pending          # Get pending fee payments
+POST   /api/admin/fees/payments         # Record fee payment
+GET    /api/admin/fees/reports          # Fee collection reports
+```
+
+### L1.5: Transport Management (Day 8)
+
+```sql
+-- Transport Routes
+CREATE TABLE transport_routes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    route_name VARCHAR(100) NOT NULL,
+    route_number VARCHAR(20) UNIQUE NOT NULL,
+    start_point VARCHAR(200) NOT NULL,
+    end_point VARCHAR(200) NOT NULL,
+    total_distance DECIMAL(8,2),
+    estimated_time INTEGER, -- in minutes
+    monthly_fee DECIMAL(10,2),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Route Stops
+CREATE TABLE route_stops (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    route_id UUID NOT NULL REFERENCES transport_routes(id) ON DELETE CASCADE,
+    stop_name VARCHAR(200) NOT NULL,
+    stop_order INTEGER NOT NULL,
+    pickup_time TIME,
+    drop_time TIME,
+    landmark VARCHAR(200),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(route_id, stop_order)
+);
+
+-- Student Transport Assignments
+CREATE TABLE student_transport (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    route_id UUID NOT NULL REFERENCES transport_routes(id),
+    pickup_stop_id UUID NOT NULL REFERENCES route_stops(id),
+    drop_stop_id UUID NOT NULL REFERENCES route_stops(id),
+    academic_year_id UUID NOT NULL REFERENCES academic_years(id),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(student_id, academic_year_id)
+);
+```
+
+### L1.6: Admin Analytics & Reports (Days 9-10)
+
+**Analytics APIs**:
+
+```
+GET    /api/admin/analytics/overview    # Dashboard KPIs
+GET    /api/admin/analytics/students    # Student statistics
+GET    /api/admin/analytics/teachers    # Teacher statistics
+GET    /api/admin/analytics/fees        # Fee collection analytics
+GET    /api/admin/analytics/transport   # Transport utilization
+```
+
+### L1.7: Integration & Testing (Days 11-12)
+
+**Tasks**:
+
+1. Connect frontend admin panel with backend APIs
+2. Test all CRUD operations
+3. Test bulk operations and data imports
+4. Performance testing with sample data
+5. Security testing and audit trails
+6. User acceptance testing with admin stakeholders
+
+### ✅ **Level 1 Completion Criteria**:
+
+- [ ] Admin can manage complete student lifecycle
+- [ ] Admin can manage complete teacher lifecycle
+- [ ] Admin can manage classes and academic structure
+- [ ] Admin can handle fee management end-to-end
+- [ ] Admin can manage transport system
+- [ ] All operations are audited and logged
+- [ ] Frontend theme works perfectly in light/dark modes
+- [ ] Performance benchmarks met
+- [ ] Security audit passed
 
 ---
 
-## Remaining Phases (Simplified)
+## Level 2: Teacher Panel Development ⏳ **NEXT LEVEL**
 
-- **Phase 5**: Attendance & Assignments (raw SQL, file handling)
-- **Phase 6**: Exams & MCQ (with anti-cheat metadata)
-- **Phase 7**: Notifications & Media (SMTP, file storage)
-- **Phase 8**: Fees, Library, Analytics (business logic)
+**Goal**: Complete teacher workflow for classroom management and assessment
+
+### Teacher Role Capabilities:
+
+- **Class Management**: View assigned classes and students
+- **Attendance Management**: Mark and track student attendance
+- **Assignment Management**: Create, distribute, and grade assignments
+- **Grade Book**: Maintain student grades and assessments
+- **Communication**: Parent-teacher messaging system
+- **Lesson Planning**: Schedule and plan lessons
+- **Resource Management**: Share study materials
+
+### L2.1: Teacher-Specific Schema
+
+```sql
+-- Attendance tracking
+CREATE TABLE attendance (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID NOT NULL REFERENCES students(id),
+    class_id UUID NOT NULL REFERENCES classes(id),
+    date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL, -- PRESENT, ABSENT, LATE, EXCUSED
+    marked_by UUID NOT NULL REFERENCES teachers(id),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(student_id, date)
+);
+
+-- Assignments
+CREATE TABLE assignments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    subject_id UUID NOT NULL REFERENCES subjects(id),
+    teacher_id UUID NOT NULL REFERENCES teachers(id),
+    due_date TIMESTAMP NOT NULL,
+    max_marks INTEGER DEFAULT 100,
+    assignment_type VARCHAR(50), -- HOMEWORK, PROJECT, QUIZ
+    instructions TEXT,
+    attachments JSONB,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Assignment submissions
+CREATE TABLE assignment_submissions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    assignment_id UUID NOT NULL REFERENCES assignments(id),
+    student_id UUID NOT NULL REFERENCES students(id),
+    submitted_at TIMESTAMP NOT NULL,
+    content TEXT,
+    attachments JSONB,
+    marks_obtained INTEGER,
+    feedback TEXT,
+    graded_by UUID REFERENCES teachers(id),
+    graded_at TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'SUBMITTED',
+    UNIQUE(assignment_id, student_id)
+);
+```
+
+---
+
+## Level 3: Student Panel Development ⏳ **FUTURE**
+
+**Goal**: Complete student learning and engagement platform
+
+### Student Role Capabilities:
+
+- **Academic Dashboard**: Overview of grades, assignments, attendance
+- **Assignment Portal**: View and submit assignments
+- **Grade Tracking**: Monitor academic performance
+- **Schedule Management**: Class timetables and events
+- **Resource Access**: Download study materials
+- **Communication**: Chat with teachers and classmates
+
+---
+
+## Level 4: Parent Panel Development ⏳ **FUTURE**
+
+**Goal**: Complete parent monitoring and engagement platform
+
+### Parent Role Capabilities:
+
+- **Child Monitoring**: Track academic progress and attendance
+- **Fee Management**: View and pay school fees online
+- **Communication**: Direct messaging with teachers
+- **Event Notifications**: School events and announcements
+- **Report Cards**: Download academic reports
+- **Transport Tracking**: Monitor school bus location
+
+---
+
+## Level 5: Specialized Roles ⏳ **FUTURE**
+
+### Librarian Panel:
+
+- **Book Management**: Catalog and inventory management
+- **Issue/Return System**: Track book transactions
+- **Fine Management**: Handle overdue fines
+- **Digital Resources**: Manage e-books and digital content
+
+### Coordinator Panel:
+
+- **Academic Coordination**: Oversee curriculum planning
+- **Event Management**: Organize school events
+- **Performance Monitoring**: Track overall academic performance
+- **Resource Allocation**: Manage classroom and equipment assignments
+
+### Media Coordinator Panel:
+
+- **Content Management**: Manage school website and social media
+- **Event Documentation**: Photo and video management
+- **Announcement System**: School-wide communications
+- **Digital Asset Management**: Organize multimedia resources
 
 ---
 
