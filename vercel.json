@@ -1,0 +1,7 @@
+{
+	"buildCommand": "cd hcs-app && npm run build",
+	"devCommand": "cd hcs-app && npm run dev",
+	"installCommand": "cd hcs-app && npm install",
+	"outputDirectory": "hcs-app/.next",
+	"framework": "nextjs"
+}
